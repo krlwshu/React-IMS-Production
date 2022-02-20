@@ -66,7 +66,7 @@ export default function Dashboard() {
       <Wrapper className="dashboard">
 
         {/* <h1>Dashboard</h1> */}
-        <div class="row ">
+        <div className="row ">
 
           <div className="col-lg-3">
             <Card sx={{ p: 5, radius: 5 }}>

@@ -42,6 +42,11 @@ function Navigation() {
                   Supplier Order View
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/supplierorders">
+                  Log Out
+                </NavLink>
+              </li>
             </ul>
           </div>
         </div>

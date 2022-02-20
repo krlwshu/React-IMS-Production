@@ -39,16 +39,16 @@ function ManageOrders() {
 
   return (
     <div className="contact">
-      <StyledContainer class="container">
-        <div class="row align-items-center my-5">
-          <div class="col-lg-12">
+      <StyledContainer className="container">
+        <div className="row align-items-center my-5">
+          <div className="col-lg-12">
 
             <Typography variant="h4" component="h4" sx={{ pb: 5, fontWeight: 400 }}>
               Manage Ordered Items
             </Typography>
 
           </div>
-          <div class="col-lg-12">
+          <div className="col-lg-12">
 
 
             {

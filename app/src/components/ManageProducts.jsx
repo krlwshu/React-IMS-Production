@@ -112,9 +112,9 @@ const handleSubmit = () => {
   
   return (
     <div className="contact">
-      <div class="container">
-        <div class="row align-items-center my-5">
-          <div class="col-lg-12">
+      <div className="container">
+        <div className="row align-items-center my-5">
+          <div className="col-lg-12">
             <Typography variant="h4" component="h4">
               Add New Products
             </Typography>

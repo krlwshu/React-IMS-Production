@@ -46,10 +46,10 @@ function Home() {
 
   return (
     <div className="home">
-      <div class="container">
-        <div class="row align-items-center my-5">
+      <div className="container">
+        <div className="row align-items-center my-5">
           {storyData.map((story, id) => (
-            <div class="col-lg-6" key={id}>
+            <div className="col-lg-6" key={id}>
               <StoryCard
                 onClick={() => handleStoryClick(story)}
                 role={story.role}

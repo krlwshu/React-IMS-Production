@@ -4,6 +4,7 @@ import { DataTable, InventoryCart } from "./index";
 import Badge from '@mui/material/Badge';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Button } from '@mui/material';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { Wrapper, StyledButton } from "./uiComponents/styled/Order.styles";
@@ -26,10 +27,26 @@ function Inventory() {
     }, [orderState]);
     
 
-    // alert(localStorage.getItem("name"))
+    const checkAuth = () => {  
+
+        const tokenString = localStorage.getItem('token');
+        const userToken = JSON.parse(tokenString);
+        console.log(userToken)
+
+        axios.get("http://localhost:5000/isLoggedIn", {
+            headers: {"x-access-token":userToken},
+        }).then((response)=> {
+            console.log(response)
+        })
+
+    }
 
     return (
         <Wrapper >
+
+            <Button onClick={checkAuth} variant="contained" color="error">
+              Check Auth
+            </Button>
             <InventoryCart
                 openState={cartOpen}
                 setOpenState={setOpenState}
@@ -43,9 +60,9 @@ function Inventory() {
                 </Badge>
             </StyledButton>
 
-            {/* <div class="container"> */}
-                <div class="row align-items-center my-5">
-                    <div class="col-lg-12">
+            {/* <div className="container"> */}
+                <div className="row align-items-center my-5">
+                    <div className="col-lg-12">
                         <Typography variant="h5" component="h5">
                             Inventory List
                         </Typography>
@@ -66,3 +83,4 @@ function Inventory() {
 }
 
 export default Inventory;
+

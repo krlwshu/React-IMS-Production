@@ -3,11 +3,14 @@ const app = express(); //Line 2
 const port = process.env.PORT || 5000; //Line 3
 const mysql = require('mysql');
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
+
 
 const db = mysql.createConnection({
   user: 'root',
@@ -16,9 +19,68 @@ const db = mysql.createConnection({
   database: 'ims_proto',
 });
 
+app.use('/login', (req, res) => {
+
+  const username = req.body.username
+
+  db.query("select * from sys_users where email = ? limit 1", username,
+    (error, results) => {
+      if (error) {
+        res.send({err:error})
+      }
+      if(results.length >0) {
+        const id = results[0].id;
+        const token = jwt.sign({id},"jwtSecret",{
+          expiresIn: 300
+        })
+        
+        // req.session.user = results;
+        res.json({
+          token: token
+        })
+        
+      } else {
+        res.send({error:"not found"})
+      }
+    });
+
+
+});
 
 
 
+
+const verifyJWT = (req, res, next) => {
+
+  const token = req.headers["x-access-token"];
+
+  if (!token) {
+    res.send("No token received.")
+  } else {
+    jwt.verify(token, "jwtSecret", (err, decoded) => {
+      if (err) {
+        res.json({ auth: false, message: "Auth failure" })
+      } else {
+        req.userId = decoded.id;
+        next();
+
+      }
+    })
+  }
+}
+
+app.get('/isLoggedIn', verifyJWT, (req, res) => {
+  res.send({
+    "auth": true,
+    "message": "Authenticated"
+  })
+})
+
+app.post('/testep', async (req, res) => {
+
+  res.status(200).json("OK")
+
+})
 app.post('/getProducts', async (req, res) => {
   try {
 

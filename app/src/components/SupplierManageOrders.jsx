@@ -210,16 +210,16 @@ export default function DataTable() {
 
 
     <div className="supplier_orders">
-      <StyledContainer class="container">
-        <div class="row align-items-center my-5">
-          <div class="col-lg-12">
+      <StyledContainer className="container">
+        <div className="row align-items-center my-5">
+          <div className="col-lg-12">
 
             <Typography variant="h3" component="h3" sx={{ pb: 5, fontWeight: 400 }}>
               New Order Requests ({(orderData.length)&& orderData.length || 0})
             </Typography>
 
           </div>
-          <div class="col-lg-12">
+          <div className="col-lg-12">
 
             <div style={{ height: 560, width: '100%' }}>
               <DataGrid

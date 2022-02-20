@@ -7,7 +7,7 @@ export default function SearchButton(props) {
         <div className='search-btn' type="submit"><ManageSearchIcon sx={{mt:1}} /></div>
         <div className='search-field'>
 
-            <input class="input-field"
+            <input className="input-field"
                 type="text"
                 placeholder={props.placeholder}
                 onChange={props.onChange}
