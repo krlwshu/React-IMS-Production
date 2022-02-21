@@ -20,21 +20,22 @@ async function loginUser(credentials) {
   return fetch('http://localhost:5000/login', {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     },
     body: JSON.stringify(credentials)
   })
     .then(data => data.json())
- }
-
-
+}
+  
+  
 const theme = createTheme();
-
+  
 export default function Login({setToken}) {
 
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
+
 
   const handleSubmit = async e => {
     e.preventDefault();

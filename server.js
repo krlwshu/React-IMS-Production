@@ -4,6 +4,7 @@ const port = process.env.PORT || 5000; //Line 3
 const mysql = require('mysql');
 const cors = require('cors');
 var jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
@@ -19,35 +20,54 @@ const db = mysql.createConnection({
   database: 'ims_proto',
 });
 
+
+//Authentication handling, issue token upon successful password verification
+
 app.use('/login', (req, res) => {
 
-  const username = req.body.username
+  const user = req.body.username
+  const pass = req.body.password
 
-  db.query("select * from sys_users where email = ? limit 1", username,
-    (error, results) => {
-      if (error) {
-        res.send({err:error})
-      }
-      if(results.length >0) {
-        const id = results[0].id;
-        const token = jwt.sign({id},"jwtSecret",{
-          expiresIn: 300
-        })
-        
-        // req.session.user = results;
-        res.json({
-          token: token
-        })
-        
-      } else {
-        res.send({error:"not found"})
-      }
-    });
+  if (!pass.length || !user.length) {
+    res.status(403).json("Invalid request")
+  } else {
 
+    db.query("select * from sys_users where email = ? limit 1", user,
+      (error, results) => {
+        if (error) {
+          res.send({ err: error })
+        }
+        //If (results) and password match, sign token
+        if (results.length > 0 && verifyPass(pass, results[0].password)) {
+          const id = results[0].id;
+          const token = jwt.sign({ id }, "jwtSecret", {
+            expiresIn: 300
+          })
 
+          // req.session.user = results;
+          res.json({
+            token: token,
+            verificationStatus: true
+          })
+
+        } else {
+          res.send({ error: "User authentication failure" })
+        }
+      });
+  }
 });
 
 
+// Verify pwd - takes plain text and encryped, verifies and returns true or false
+const verifyPass = (ptPwd, encPwd) => { 
+  return bcrypt.compareSync(ptPwd, encPwd)  
+}
+
+// Enc password - for new accounts
+const encrptyPassword = (origPwd) => { 
+  let encPwd = bcrypt.hashSync(origPwd, 10);
+  return encPwd
+ }
 
 
 const verifyJWT = (req, res, next) => {
@@ -69,18 +89,14 @@ const verifyJWT = (req, res, next) => {
   }
 }
 
-app.get('/isLoggedIn', verifyJWT, (req, res) => {
+app.get('/authVerify', verifyJWT, (req, res) => {
   res.send({
     "auth": true,
     "message": "Authenticated"
   })
 })
 
-app.post('/testep', async (req, res) => {
 
-  res.status(200).json("OK")
-
-})
 app.post('/getProducts', async (req, res) => {
   try {
 
@@ -513,3 +529,5 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
     }
   });
 });
+
+

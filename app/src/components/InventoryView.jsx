@@ -4,13 +4,15 @@ import { DataTable, InventoryCart } from "./index";
 import Badge from '@mui/material/Badge';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Button } from '@mui/material';
-import axios from 'axios';
+import useToken from './auth/useToken';
+
 
 import styled from 'styled-components';
 import { Wrapper, StyledButton } from "./uiComponents/styled/Order.styles";
 
 function Inventory() {
 
+    const {verifyToken} = useToken();
 
     // Orders
     const [orderState, setOrderState] = useState([]);
@@ -27,24 +29,12 @@ function Inventory() {
     }, [orderState]);
     
 
-    const checkAuth = () => {  
 
-        const tokenString = localStorage.getItem('token');
-        const userToken = JSON.parse(tokenString);
-        console.log(userToken)
-
-        axios.get("http://localhost:5000/isLoggedIn", {
-            headers: {"x-access-token":userToken},
-        }).then((response)=> {
-            console.log(response)
-        })
-
-    }
 
     return (
         <Wrapper >
 
-            <Button onClick={checkAuth} variant="contained" color="error">
+            <Button onClick={verifyToken} variant="contained" color="error">
               Check Auth
             </Button>
             <InventoryCart
