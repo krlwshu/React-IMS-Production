@@ -306,7 +306,8 @@ app.post('/getOrderUpdates', async (req, res) => {
 
     let productSql = `
       SELECT 
-      o.id, 
+      oi.id,
+      o.id order_id, 
       o.status, 
       p.category, 
       p.product_code, 

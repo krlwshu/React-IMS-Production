@@ -14,7 +14,8 @@ import {
   Inventory,
   ManageOrders,
   SupplierManageOrders,
-  Dashboard
+  Dashboard,
+  SearchEngine
 } from "./components";
 
 
@@ -39,6 +40,7 @@ const App = () => {
       <Route path="/manageproducts" element={<ManageProducts />} />
       <Route path="/supplierorders" element={<SupplierManageOrders />} />
       <Route path="/manageorders" element={<ManageOrders />} />
+      <Route path="/searchEngine" element={<SearchEngine />} />
     </Routes>
     <Footer />
   </Router>

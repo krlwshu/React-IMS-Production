@@ -9,18 +9,11 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ImageIcon from '@mui/icons-material/Image';
-import WorkIcon from '@mui/icons-material/Work';
-import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import RouterIcon from '@mui/icons-material/Router';
 import { Wrapper, StyledCard } from "./uiComponents/styled/Dashboard-styles";
-import { styled } from '@mui/material/styles';
 
 // icons
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FiberNewIcon from '@mui/icons-material/FiberNew';
-
 
 
 export default function Dashboard() {
@@ -82,7 +75,7 @@ export default function Dashboard() {
                   data.filter((item) => item.supplier_approval_status == 'Partial').map(item =>
                   (
 
-                    <React.Fragment>
+                    <React.Fragment key={item.id} >
                       <ListItem key={item.id}>
                         <ListItemAvatar>
                           <Avatar>
@@ -116,8 +109,8 @@ export default function Dashboard() {
                   data.filter((item) => item.supplier_approval_status == 'New').map(item =>
                   (
 
-                    <React.Fragment>
-                      <ListItem key={item.id}>
+                    <React.Fragment key={item.id}>
+                      <ListItem key={`${item.id}_1`}>
                         <ListItemAvatar>
                           <Avatar>
                             <RouterIcon />
@@ -151,7 +144,7 @@ export default function Dashboard() {
                   alertingData.map(item =>
                   (
 
-                    <React.Fragment>
+                    <React.Fragment key={item.id}>
                       <ListItem key={item.id}>
                         <ListItemAvatar>
                           <Avatar>
