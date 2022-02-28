@@ -1,16 +1,16 @@
 const express = require('express'); //Line 1
-const app = express(); //Line 2
+const server = express(); //Line 2
 const port = process.env.PORT || 5000; //Line 3
 const mysql = require('mysql');
 const cors = require('cors');
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(port, () => console.log(`Listening on port ${port}`));
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
+server.use(express.urlencoded({ extended: true }));
+server.use(express.json());
+server.use(cors());
 
 
 const db = mysql.createConnection({
@@ -23,7 +23,7 @@ const db = mysql.createConnection({
 
 //Authentication handling, issue token upon successful password verification
 
-app.use('/login', (req, res) => {
+server.use('/login', (req, res) => {
 
   const user = req.body.username
   const pass = req.body.password
@@ -59,15 +59,15 @@ app.use('/login', (req, res) => {
 
 
 // Verify pwd - takes plain text and encryped, verifies and returns true or false
-const verifyPass = (ptPwd, encPwd) => { 
-  return bcrypt.compareSync(ptPwd, encPwd)  
+const verifyPass = (ptPwd, encPwd) => {
+  return bcrypt.compareSync(ptPwd, encPwd)
 }
 
 // Enc password - for new accounts
-const encrptyPassword = (origPwd) => { 
+const encrptyPassword = (origPwd) => {
   let encPwd = bcrypt.hashSync(origPwd, 10);
   return encPwd
- }
+}
 
 
 const verifyJWT = (req, res, next) => {
@@ -89,15 +89,16 @@ const verifyJWT = (req, res, next) => {
   }
 }
 
-app.get('/authVerify', verifyJWT, (req, res) => {
+server.get('/authVerify', verifyJWT, (req, res) => {
   res.send({
     "auth": true,
-    "message": "Authenticated"
+    "message": "Authenticated",
+    "id": req.userId
   })
 })
 
 
-app.post('/getProducts', async (req, res) => {
+server.post('/getProducts', async (req, res) => {
   try {
 
     let productSql = `
@@ -124,18 +125,18 @@ app.post('/getProducts', async (req, res) => {
   }
 });
 
-app.post('/getOrderItems', async (req, res) => {
+server.post('/getOrderItems', async (req, res) => {
 
   // TEMP FOR PROTO
   const { supplierId } = req.body;
   console.log(supplierId);
   //
 
-  let filter = (supplierId != 0) ?  ` where s.id = ${supplierId} ` : '';
+  let filter = (supplierId != 0) ? ` where s.id = ${supplierId} ` : '';
 
   try {
 
-    
+
     let productSql = `
         select
         oi.id as id,
@@ -160,7 +161,7 @@ app.post('/getOrderItems', async (req, res) => {
         `;
 
     // TEMP FOR PROTO
-    
+
     //
     console.log(productSql);
 
@@ -174,7 +175,7 @@ app.post('/getOrderItems', async (req, res) => {
 
 // Handles Approve, Reject and Partial approvals 
 // if full Approve, updates current stock level
-app.post('/processOrderItem', async (req, res) => {
+server.post('/processOrderItem', async (req, res) => {
   const status = { action: 'Process Order', process_status: null, stock_update: null };
   const data = req.body;
 
@@ -241,7 +242,7 @@ const updateInventoryByOrderId = (order, qty) => new Promise((resolve, reject) =
 
 // Get Supplier Details (Form)
 
-app.post('/getSuppliersProductTypes', async (req, res) => {
+server.post('/getSuppliersProductTypes', async (req, res) => {
 
   try {
 
@@ -264,7 +265,7 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
 
 // Create new product
 
-app.post('/createNewProduct', async (req, res) => {
+server.post('/createNewProduct', async (req, res) => {
 
   const data = req.body;
   try {
@@ -300,7 +301,7 @@ const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
 // Get order updates - dashboard feed
 
-app.post('/getOrderUpdates', async (req, res) => {
+server.post('/getOrderUpdates', async (req, res) => {
 
   try {
 
@@ -357,7 +358,7 @@ const runQuery = (sql) => new Promise((resolve, reject) => {
 
 // Create new orders
 
-app.post('/submitOrder', async (req, res) => {
+server.post('/submitOrder', async (req, res) => {
 
   const orderData = req.body;
   let uniqueSuppliers = [...new Set(orderData.map(item => item.supplier_id))]
@@ -427,7 +428,7 @@ const createOrderItems = (orderItems) => new Promise((resolve, reject) => {
 
 
 
-async function notifySupplierByEmail(order){
+async function notifySupplierByEmail(order) {
   var nodemailer = require('nodemailer');
   let getSuppContact = `SELECT
       contact_email, s.id, company_name FROM orders o
@@ -459,7 +460,7 @@ async function notifySupplierByEmail(order){
     to: supp[0].contact_email, // list of receivers (who receives)
     subject: 'New Order Request Received!', // Subject line
     text: 'New Order ', // plaintext body
-    html: '<p>Dear '+ supp[0].company_name+'</p><b>You Have a New Order #' + order + ' </b><br><a href="http://localhost:3000/supplierorders?s='+supp[0].id+'">Please review and submit your response.</a>' // html body
+    html: '<p>Dear ' + supp[0].company_name + '</p><b>You Have a New Order #' + order + ' </b><br><a href="http://localhost:3000/supplierorders?s=' + supp[0].id + '">Please review and submit your response.</a>' // html body
   };
 
 
@@ -477,7 +478,7 @@ async function notifySupplierByEmail(order){
 
 
 
-app.post('/getAlerting', async (req, res) => {
+server.post('/getAlerting', async (req, res) => {
 
   try {
 
@@ -499,9 +500,9 @@ app.post('/getAlerting', async (req, res) => {
 
 
 
-app.post('/processOrderApproveCancel', async (req, res) => {
-  const {item, appStatus} = req.body;
-console.log(appStatus);
+server.post('/processOrderApproveCancel', async (req, res) => {
+  const { item, appStatus } = req.body;
+  console.log(appStatus);
 
   try {
     const orderUpdateStatus = await updateOrderLineItem(item, appStatus);
@@ -532,3 +533,4 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
 });
 
 
+module.exports = server

@@ -4,7 +4,7 @@
   "description": "Stage 1 Prototype",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll",
     "server": "nodemon server.js"
   },
   "author": "Karl Webster",
@@ -16,6 +16,13 @@
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "nodemailer": "^6.7.2",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "save-dev": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1",
+    "superagent": "^7.1.1",
+    "supertest": "^6.2.2"
   }
 }
