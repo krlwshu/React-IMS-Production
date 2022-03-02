@@ -23,11 +23,11 @@ import {
 
 const App = () => {
 
-  const { setToken, verifyAuth } = useToken();
+  // const { setToken, verifyAuth } = useToken();
 
-  if (!verifyAuth()) {
-    return <Login setToken={setToken} />
-  }
+  // if (!verifyAuth()) {
+  //   return <Login setToken={setToken} />
+  // }
 
   return (
 

@@ -1,15 +1,16 @@
 import React from "react";
+import { StyledFooter } from "./uiComponents/styled/Nav.styles";
 
 function Footer() {
   return (
     <div className="footer">
-      <footer className="py-5 bg-dark fixed-bottom">
+      <StyledFooter className="py-2 bg-dark fixed-bottom">
         <div className="container">
           <p className="m-0 text-center text-white">
             Prototype &copy; Inventory Management System
           </p>
         </div>
-      </footer>
+      </StyledFooter>
     </div>
   );
 }

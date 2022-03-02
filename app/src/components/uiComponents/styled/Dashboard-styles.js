@@ -1,9 +1,14 @@
 import styled from "styled-components";
-import { Card } from "@mui/material";
+import {
+    Card
+} from "@mui/material";
 
 export const Wrapper = styled.div`
-  margin: 40px;
-//   margin-right:200px;
+    margin: 0 5rem 0;
+    padding:3rem;
+    background-color:white;
+    height:100%;
+    color:#616161;
 `;
 
 
@@ -27,7 +32,8 @@ export const OrdersFeed = styled.div`
 `;
 
 
-export const StyledCard = styled(Card)`
+export const StyledCard = styled(Card)
+    `
     &&&{
         background-color:purple;
         border-radius:10px;
@@ -37,3 +43,5 @@ export const StyledCard = styled(Card)`
 
 
 `
+
+

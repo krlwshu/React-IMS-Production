@@ -366,6 +366,21 @@ app.post('/getOrderUpdates', async (req, res) => {
     res.sendStatus(500);
   }
 });
+app.post('/getDashData', async (req, res) => {
+
+  try {
+
+    let productSql = `
+    SELECT supplier_approval_status AS name, count(supplier_approval_status) AS value, SUM(requested_quantity) as req FROM  order_items
+    GROUP BY supplier_approval_status
+      `;
+    //Get header data from db and create object tree
+    let products = await runQuery(productSql);
+    res.status(200).json(products);
+  } catch (e) {
+    res.sendStatus(500);
+  }
+});
 
 
 
@@ -562,6 +577,10 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
     }
   });
 });
+
+
+
+
 
 
 module.exports = app

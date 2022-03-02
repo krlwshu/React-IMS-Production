@@ -1,10 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+import { StyledNav } from "./uiComponents/styled/Nav.styles";
+
 function Navigation() {
   return (
     <div className="navigation">
-      <nav className="navbar navbar-expand navbar-dark bg-dark">
+      <StyledNav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
           <NavLink className="navbar-brand" to="/">
             Inventory Management System
@@ -55,7 +57,7 @@ function Navigation() {
             </ul>
           </div>
         </div>
-      </nav>
+      </StyledNav>
     </div>
   );
 }
