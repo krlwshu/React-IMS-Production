@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
@@ -21,38 +21,38 @@ import {
 
 
 
-const App = () => { 
+const App = () => {
 
-  const {  setToken, verifyAuth } = useToken();
+  const { setToken, verifyAuth } = useToken();
 
-  if(!verifyAuth() ){
+  if (!verifyAuth()) {
     return <Login setToken={setToken} />
   }
 
   return (
 
     <Router>
-    <Navigation />
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/inventory" element={<Inventory />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/manageproducts" element={<ManageProducts />} />
-      <Route path="/supplierorders" element={<SupplierManageOrders />} />
-      <Route path="/manageorders" element={<ManageOrders />} />
-      <Route path="/searchEngine" element={<SearchEngine />} />
-    </Routes>
-    <Footer />
-  </Router>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/manageproducts" element={<ManageProducts />} />
+        <Route path="/supplierorders" element={<SupplierManageOrders />} />
+        <Route path="/manageorders" element={<ManageOrders />} />
+        <Route path="/searchEngine" element={<SearchEngine />} />
+      </Routes>
+      <Footer />
+    </Router>
 
   )
- }
+}
 
 //  export default App;
 
 ReactDOM.render(
-  <App/>
-,
+  <App />
+  ,
   document.getElementById("root")
 );
 

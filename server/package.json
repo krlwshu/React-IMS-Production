@@ -4,7 +4,7 @@
   "description": "Stage 1 Prototype",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll",
+    "test": "jest --forceExit --detectOpenHandles  --watchAll --maxWorkers=1",
     "server": "nodemon server.js"
   },
   "author": "Karl Webster",
@@ -20,9 +20,7 @@
     "save-dev": "^0.0.1-security"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
-    "superagent": "^7.1.1",
     "supertest": "^6.2.2"
   }
 }

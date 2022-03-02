@@ -1,16 +1,18 @@
 const express = require('express'); //Line 1
-const server = express(); //Line 2
+const app = express(); //Line 2
 const port = process.env.PORT || 5000; //Line 3
 const mysql = require('mysql');
 const cors = require('cors');
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => console.log(`Listening on port ${port}`));
+}
 
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
-server.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors());
 
 
 const db = mysql.createConnection({
@@ -23,16 +25,19 @@ const db = mysql.createConnection({
 
 //Authentication handling, issue token upon successful password verification
 
-server.use('/login', (req, res) => {
+app.use('/login', (req, res) => {
 
   const user = req.body.username
   const pass = req.body.password
 
-  if (!pass.length || !user.length) {
-    res.status(403).json("Invalid request")
+  const AUTH_FAILURE = { error: "Auth failure" }
+
+
+  if (pass === '' || user === '') {
+    res.status(401).json(AUTH_FAILURE)
   } else {
 
-    db.query("select * from sys_users where email = ? limit 1", user,
+    db.query("select * from sys_users where email = ? and active = 1 limit 1", user,
       (error, results) => {
         if (error) {
           res.send({ err: error })
@@ -47,11 +52,11 @@ server.use('/login', (req, res) => {
           // req.session.user = results;
           res.json({
             token: token,
-            verificationStatus: true
+            verificationStatus: "Success"
           })
 
         } else {
-          res.send({ error: "User authentication failure" })
+          res.status(401).json(AUTH_FAILURE)
         }
       });
   }
@@ -89,7 +94,7 @@ const verifyJWT = (req, res, next) => {
   }
 }
 
-server.get('/authVerify', verifyJWT, (req, res) => {
+app.get('/authVerify', verifyJWT, (req, res) => {
   res.send({
     "auth": true,
     "message": "Authenticated",
@@ -98,7 +103,33 @@ server.get('/authVerify', verifyJWT, (req, res) => {
 })
 
 
-server.post('/getProducts', async (req, res) => {
+
+app.post('/authenticate', (req, res) => {
+
+  //Let's do some driven development
+  //Currently the test case is failing, lets make it pass!!! 
+  // <-- Test is on that screen
+
+  const { username, password } = req.body
+
+  const sql = `select * from sys_users where email = ?`
+
+  db.query(sql, username, (err, results) => {
+    if (err) { res.send(500) } // ok so were not seeing a 500...good!
+    if (verifyPass(password, results[0].password)) {
+      res.status(200).json({ authStatus: "Success" })
+    } else {
+      res.status(401).json({ authStatus: "Unauthorized" })
+
+    }
+  })
+
+  // done
+
+})
+
+
+app.post('/getProducts', async (req, res) => {
   try {
 
     let productSql = `
@@ -125,7 +156,7 @@ server.post('/getProducts', async (req, res) => {
   }
 });
 
-server.post('/getOrderItems', async (req, res) => {
+app.post('/getOrderItems', async (req, res) => {
 
   // TEMP FOR PROTO
   const { supplierId } = req.body;
@@ -175,7 +206,7 @@ server.post('/getOrderItems', async (req, res) => {
 
 // Handles Approve, Reject and Partial approvals 
 // if full Approve, updates current stock level
-server.post('/processOrderItem', async (req, res) => {
+app.post('/processOrderItem', async (req, res) => {
   const status = { action: 'Process Order', process_status: null, stock_update: null };
   const data = req.body;
 
@@ -242,7 +273,7 @@ const updateInventoryByOrderId = (order, qty) => new Promise((resolve, reject) =
 
 // Get Supplier Details (Form)
 
-server.post('/getSuppliersProductTypes', async (req, res) => {
+app.post('/getSuppliersProductTypes', async (req, res) => {
 
   try {
 
@@ -265,7 +296,7 @@ server.post('/getSuppliersProductTypes', async (req, res) => {
 
 // Create new product
 
-server.post('/createNewProduct', async (req, res) => {
+app.post('/createNewProduct', async (req, res) => {
 
   const data = req.body;
   try {
@@ -301,7 +332,7 @@ const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
 // Get order updates - dashboard feed
 
-server.post('/getOrderUpdates', async (req, res) => {
+app.post('/getOrderUpdates', async (req, res) => {
 
   try {
 
@@ -358,7 +389,7 @@ const runQuery = (sql) => new Promise((resolve, reject) => {
 
 // Create new orders
 
-server.post('/submitOrder', async (req, res) => {
+app.post('/submitOrder', async (req, res) => {
 
   const orderData = req.body;
   let uniqueSuppliers = [...new Set(orderData.map(item => item.supplier_id))]
@@ -478,7 +509,7 @@ async function notifySupplierByEmail(order) {
 
 
 
-server.post('/getAlerting', async (req, res) => {
+app.post('/getAlerting', async (req, res) => {
 
   try {
 
@@ -500,7 +531,7 @@ server.post('/getAlerting', async (req, res) => {
 
 
 
-server.post('/processOrderApproveCancel', async (req, res) => {
+app.post('/processOrderApproveCancel', async (req, res) => {
   const { item, appStatus } = req.body;
   console.log(appStatus);
 
@@ -533,4 +564,4 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
 });
 
 
-module.exports = server
+module.exports = app
