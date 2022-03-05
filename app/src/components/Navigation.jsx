@@ -21,12 +21,7 @@ function Navigation() {
               </li>
               <li className="nav-item">
                 <NavLink className="nav-link" to="/inventory">
-                  Inventory
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/searchEngine">
-                  Search Engine
+                  Product Inventory
                 </NavLink>
               </li>
               <li className="nav-item">

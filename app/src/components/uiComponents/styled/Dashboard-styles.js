@@ -7,7 +7,7 @@ export const Wrapper = styled.div`
     margin: 0 5rem 0;
     padding:3rem;
     background-color:white;
-    height:100%;
+    min-height:100%;
     color:#616161;
 `;
 

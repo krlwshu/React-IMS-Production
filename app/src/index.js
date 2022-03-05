@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import store from './redux/store'
+import { Provider } from 'react-redux'
+
 import useToken from './components/auth/useToken';
 import axios from 'axios';
 
@@ -11,11 +14,12 @@ import {
   Navigation,
   Footer,
   ManageProducts,
-  Inventory,
   ManageOrders,
   SupplierManageOrders,
   Dashboard,
-  SearchEngine
+  Inventory,
+  InventorySearch,
+  TestRedux
 } from "./components";
 
 
@@ -40,7 +44,8 @@ const App = () => {
         <Route path="/manageproducts" element={<ManageProducts />} />
         <Route path="/supplierorders" element={<SupplierManageOrders />} />
         <Route path="/manageorders" element={<ManageOrders />} />
-        <Route path="/searchEngine" element={<SearchEngine />} />
+        {/* <Route path="/inventory" element={<InventorySearch />} /> */}
+        <Route path="/testredux" element={<TestRedux />} />
       </Routes>
       <Footer />
     </Router>
@@ -51,7 +56,9 @@ const App = () => {
 //  export default App;
 
 ReactDOM.render(
-  <App />
+  <Provider store={store}>
+    <App />
+  </Provider>
   ,
   document.getElementById("root")
 );
