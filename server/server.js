@@ -419,7 +419,7 @@ app.post('/submitOrder', async (req, res) => {
 
       // Filter, then create items
       let orderItems = orderData.filter(item => item.supplier_id === supplier)
-        .map(item => [item.prod_id, item.qty, status.orderId]);
+        .map(item => [item.prod_id, item.requested_quantity, status.orderId]);
       status.itemOrderStatus = await createOrderItems(orderItems);
 
       // Update status to send back to client

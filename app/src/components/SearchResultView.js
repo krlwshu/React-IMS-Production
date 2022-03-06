@@ -1,12 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import Chip from '@material-ui/core/Chip';
 import Button from '@mui/material/Button'
-
-
+import Box from '@mui/material/Box';
 
 // Buttons
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { StyledDeleteIcon } from "./uiComponents/styled/InventorySearch-styles";
+
+// Lists MUI
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+
+
+// Typography
+import Typography from '@mui/material/Typography';
+
+// Redux 
+import { useSelector, useDispatch } from "react-redux";
+import { addItem, delItem } from "../redux/cartSlice";
+import { selectItems } from "../redux/cartSlice";
+import ButtonGroup from '@mui/material/ButtonGroup'
+
+
+
+
 
 const styles = {
   root: {
@@ -23,24 +42,36 @@ const styles = {
   }
 };
 
-
-
-// export default function SearchResultView() {
-//   return (
-//     <div>SearchResultView</div>
-//   )
-// }
-
-
 export default function Results({ teststate, result, onClickLink, ...rest }) {
 
+  const dispatch = useDispatch();
 
-  const handleClick = (data) => {
-    console.log(data.category.raw)
-    console.log(data.description.raw)
-    console.log(data.id.raw)
+  const items = useSelector(selectItems);
 
+  // Remove from Redux state
+  const handleDelItem = (data) => {
+    dispatch(delItem({ id: data.id.raw }));
+  }
 
+  // Add to Redux state
+  const handleAddItem = (data) => {
+    const payload = {
+      id: data.id.raw,
+      prod_id: data.id.raw,
+      product: data.product_code.raw,
+      requested_quantity: 1,
+      supplier: data.supplier.raw,
+      manufacturer: data.manufacturer.raw,
+      description: data.description.raw,
+      supplier_id: data.supplier_id.raw
+    }
+    // console.log(payload)
+    dispatch(addItem(payload));
+  };
+
+  const getCartItems = (id) => {
+    const item = items.find((i) => i.id === id);
+    return item ? item.requested_qty : 0;
   }
 
   return (
@@ -58,6 +89,8 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             dangerouslySetInnerHTML={{ __html: result.description.snippet }}
           />
         </a>
+        <StyledDeleteIcon color="error" />
+
       </div>
       <div className="sui-result__body">
         <div className="col-lg-3">
@@ -83,7 +116,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             />
           </div>
         </div>
-        <div className="col-lg-4">
+        <div className="col-lg-5">
 
           <ul className="sui-result__details">
             <li>
@@ -128,9 +161,29 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
         </div>
         <div className="col-lg-4">
 
-          <div>
-            <AddCircleIcon color="success" onClick={() => handleClick(result)} />
-            <RemoveCircleIcon color="error" onClick={() => handleClick(result)} />
+          <div className="sui-result-actionBtns">
+            <ButtonGroup variant="text" color="primary" aria-label="">
+              <Typography sx={{ mx: 2, fontWeight: "400" }} variant="p" component="div">
+                Order More:
+              </Typography>
+              <AddCircleOutlineIcon className="sui-addToCart"
+                size="small"
+                onClick={() => handleAddItem(result)}
+                color="success"
+              >+
+              </AddCircleOutlineIcon>
+              <Box sx={{ fontWeight: "500" }} px={1}>
+                {0}
+              </Box>
+              <RemoveCircleOutlineIcon className="sui-remFromCart"
+                size="small"
+                color="error"
+                onClick={() => handleDelItem(result)}
+              >
+                -
+              </RemoveCircleOutlineIcon>
+
+            </ButtonGroup>
             {/* <AddCircleIcon onClick={() => handleAddItem(cell.row)} color="success" />
           <RemoveCircleIcon onClick={() => handleDeleteItem(cell.row)} color="error" /> */}
           </div>
@@ -139,4 +192,3 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
     </li>
   )
 };
-

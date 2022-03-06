@@ -7,7 +7,7 @@ function Footer() {
       <StyledFooter className="py-2 bg-dark fixed-bottom">
         <div className="container">
           <p className="m-0 text-center text-white">
-            Prototype &copy; Inventory Management System
+            Production &copy; Inventory Management System
           </p>
         </div>
       </StyledFooter>

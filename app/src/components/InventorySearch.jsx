@@ -27,6 +27,7 @@ import {
 } from "./config/config-helper";
 
 import SearchResultView from "./SearchResultView.js";
+import { Wrapper } from "./uiComponents/styled/InventorySearch-styles";
 
 const { hostIdentifier, searchKey, endpointBase, engineName } = getConfig();
 const connector = new AppSearchAPIConnector({
@@ -48,50 +49,53 @@ const config = {
 export default function InventoryView({ orderState }) {
   console.log(orderState);
   return (
-    <SearchProvider config={config}>
-      <WithSearch mapContextToProps={({ wasSearched }) => ({ wasSearched })}>
-        {({ wasSearched }) => {
-          return (
-            <div className="App">
-              <ErrorBoundary>
-                <Layout
-                  header={<SearchBox autocompleteSuggestions={true} />}
-                  sideContent={
-                    <div>
-                      {wasSearched && (
-                        <Sorting
-                          label={"Sort by"}
-                          sortOptions={buildSortOptionsFromConfig()}
-                        />
-                      )}
-                      {getFacetFields().map((field) => (
-                        <Facet key={field} field={field} label={field} />
-                      ))}
-                    </div>
-                  }
-                  teststate="teststate"
-                  bodyContent={
-                    <Results
-                      titleField={getConfig().titleField}
-                      urlField={getConfig().urlField}
-                      thumbnailField={getConfig().thumbnailField}
-                      shouldTrackClickThrough={true}
-                      resultView={SearchResultView}
-                    />
-                  }
-                  bodyHeader={
-                    <React.Fragment>
-                      {wasSearched && <PagingInfo />}
-                      {wasSearched && <ResultsPerPage />}
-                    </React.Fragment>
-                  }
-                  bodyFooter={<Paging />}
-                />
-              </ErrorBoundary>
-            </div>
-          );
-        }}
-      </WithSearch>
-    </SearchProvider>
+    <Wrapper>
+      <h4>Inventory Search</h4>
+      <SearchProvider config={config}>
+        <WithSearch mapContextToProps={({ wasSearched }) => ({ wasSearched })}>
+          {({ wasSearched }) => {
+            return (
+              <div className="App">
+                <ErrorBoundary>
+                  <Layout
+                    header={<SearchBox autocompleteSuggestions={true} />}
+                    sideContent={
+                      <div>
+                        {wasSearched && (
+                          <Sorting
+                            label={"Sort by"}
+                            sortOptions={buildSortOptionsFromConfig()}
+                          />
+                        )}
+                        {getFacetFields().map((field) => (
+                          <Facet key={field} field={field} label={field} />
+                        ))}
+                      </div>
+                    }
+                    teststate="teststate"
+                    bodyContent={
+                      <Results
+                        titleField={getConfig().titleField}
+                        urlField={getConfig().urlField}
+                        thumbnailField={getConfig().thumbnailField}
+                        shouldTrackClickThrough={true}
+                        resultView={SearchResultView}
+                      />
+                    }
+                    bodyHeader={
+                      <React.Fragment>
+                        {wasSearched && <PagingInfo />}
+                        {wasSearched && <ResultsPerPage />}
+                      </React.Fragment>
+                    }
+                    bodyFooter={<Paging />}
+                  />
+                </ErrorBoundary>
+              </div>
+            );
+          }}
+        </WithSearch>
+      </SearchProvider>
+    </Wrapper>
   );
 }
