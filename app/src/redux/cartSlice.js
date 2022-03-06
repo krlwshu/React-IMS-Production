@@ -12,7 +12,6 @@ export const cartSlice = createSlice({
     // Add item to the state:
     addItem: (state, { payload }) => {
       const item = state.cartItems.find((i) => i.id === payload.id);
-      console.dir(state.cartItems)
       if (item) {
         item.requested_quantity += payload.requested_quantity;
       } else {

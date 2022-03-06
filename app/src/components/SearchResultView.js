@@ -25,8 +25,6 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 
 
 
-
-
 const styles = {
   root: {
     paddingTop: "25px",
@@ -65,14 +63,12 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
       description: data.description.raw,
       supplier_id: data.supplier_id.raw
     }
-    // console.log(payload)
     dispatch(addItem(payload));
   };
 
-  const getCartItems = (id) => {
-    const item = items.find((i) => i.id === id);
-    return item ? item.requested_qty : 0;
-  }
+  // Current item in cart
+  const itemsInCart = items.filter(item => item.id === result.id.raw)
+    .map(item => item.requested_quantity)[0] || 0;
 
   return (
 
@@ -173,7 +169,10 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
               >+
               </AddCircleOutlineIcon>
               <Box sx={{ fontWeight: "500" }} px={1}>
-                {0}
+                {
+                  itemsInCart
+                }
+
               </Box>
               <RemoveCircleOutlineIcon className="sui-remFromCart"
                 size="small"

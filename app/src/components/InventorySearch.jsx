@@ -47,7 +47,6 @@ const config = {
 };
 
 export default function InventoryView({ orderState }) {
-  console.log(orderState);
   return (
     <Wrapper>
       <h4>Inventory Search</h4>
