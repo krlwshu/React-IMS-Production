@@ -1,16 +1,16 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 
 const bull = (
   <Box
     component="span"
-    sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}
+    sx={{ display: "inline-block", mx: "2px", transform: "scale(0.8)" }}
   >
     •
   </Box>
@@ -18,7 +18,7 @@ const bull = (
 
 export default function StoryCard(props) {
   return (
-    <Card sx={{ minWidth: 275, mt:10 }}>
+    <Card sx={{ minWidth: 275, mt: 10 }}>
       <CardContent>
         <Typography variant="h5" component="div">
           {props.name}
@@ -30,15 +30,14 @@ export default function StoryCard(props) {
           {props.desc}
           <br />
         </Typography>
-        <Box sx={{ mt: "2rem" }} textAlign='left'>
+        <Box sx={{ mt: "2rem" }} textAlign="left">
           <Link href={props.link}>
-            <Button onClick={props.onClick} variant="outlined">{props.journey}</Button>
+            <Button onClick={props.onClick} variant="outlined">
+              {props.journey}
+            </Button>
           </Link>
         </Box>
       </CardContent>
-
-
-
     </Card>
   );
 }

@@ -1,6 +1,6 @@
 {
   "engineName": "ims-search-engine",
-  "endpointBase": "http://localhost:3002",
+  "endpointBase": "http://192.168.44.132:3002",
   "searchKey": "search-nyfcgwu4jt6mr4x1pfxo1gbb",
   "resultFields": [
     "supplier",
@@ -12,15 +12,12 @@
     "qty_avail",
     "id"
   ],
-  "sortFields": [
-    "qty_avail",
-    "manufacturer"
-  ],
+  "sortFields": ["category", "supplier", "manufacturer"],
   "facets": [
+    "supplier",
     "category",
     "manufacturer",
     "product_code",
-    "supplier",
     "qty_avail"
   ],
   "titleField": "description",

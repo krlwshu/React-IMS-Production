@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Box from '@mui/material/Box';
 
 export const Wrapper = styled.div`
-  margin: 40px;
+  margin: 0px 20px;
 `;
 
 
@@ -23,6 +23,6 @@ export const StyledBox = styled(Box)`
 
 export const StyledContainer = styled.div`
 &&{  
-    width:80%;
+    // width:80%;
     margin: 0 10% ;
 `;

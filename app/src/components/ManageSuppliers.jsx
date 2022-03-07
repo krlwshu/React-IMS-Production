@@ -6,96 +6,115 @@ import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
-import { useLocation, useParams } from "react-router-dom";
 
 function ManageProducts() {
-  //Get product ID
-  const location = useLocation();
-  const { slug } = useParams();
-
-  // Load existing product data
-
-  const defaultProductInfo = {
-    product_name: "",
-    company_name: "",
-    category: "",
-    product_code: "",
-    manufacturer: "",
-    description: "",
-    unit_price: "",
-    alert_level: "",
-    id: "",
-  };
-
-  const [loadingData, setLoadingData] = useState(true);
-  const [productInfo, setProductInfo] = useState(defaultProductInfo);
-
-  // alert state
-  const [alertState, setAlertState] = useState({
-    isHidden: true,
-    severity: "error",
-    message: "Nothing to see here!",
-  });
-
-  const alertSuccess = {
-    message: "Product Updated :)",
-    isHidden: false,
-    severity: "success",
-  };
-  const alertError = {
-    message: "Error updating product!!!",
-    isHidden: false,
-    severity: "Error",
-  };
-
-  useEffect(() => {
-    async function getData() {
-      await axios.post("/getProductDetails", { id: slug }).then(({ data }) => {
-        setProductInfo(data);
-        setLoadingData(false);
-      });
-    }
-    if (loadingData) {
-      getData();
-    }
-  }, [productInfo]);
-
   const [data, setData] = useState([]);
 
   async function getData() {
     await axios.post("/getSuppliersProductTypes").then(({ data }) => {
       setData(data);
     });
+    console.log("fetched");
   }
 
   useEffect(() => {
     getData();
   }, []);
 
-  const handleFormChange = (e) => {};
+  const defaultFormState = {
+    supplier: "",
+    type: "",
+    desc: "",
+    manu: "",
+    code: "",
+    alert: 0,
+    pname: "",
+  };
+  const [formState, setFormState] = React.useState(defaultFormState);
+  const [disabledState, setDisabledState] = React.useState({
+    supplier: false,
+    type: false,
+    desc: false,
+    manu: false,
+    code: false,
+    alert: false,
+    textFieldDisabled: true,
+    errors: 0,
+    submitState: false,
+    alert: {
+      severity: "error",
+      message: "Faled to create new product",
+      hidden: true,
+    },
+  });
+
+  const handleFormChange = (e) => {
+    formState[e.target.id] = e.target.value;
+    setFormState({ ...formState });
+
+    // Unlock form (or not)
+    if (formState.supplier && formState.type) {
+      disabledState.textFieldDisabled = false;
+    } else {
+      disabledState.textFieldDisabled = true;
+    }
+    if (e.target.value === "") {
+      disabledState[e.target.id] = true;
+      disabledState.errors++;
+    }
+
+    setDisabledState({ ...disabledState });
+    console.log(disabledState.errors);
+  };
 
   const handleSubmit = () => {
-    axios
-      .post("/createNewProduct", { productInfo })
-      .then((response) => {
-        if (response.status) {
-        } else {
-          console.log("Error processing request");
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    validateForm();
+
+    if (disabledState.errors === 0) {
+      let supplierId = data.find(
+        (item) => item.company_name === formState.supplier
+      ).id;
+
+      axios
+        .post("/createNewProduct", { formState, supplierId })
+        .then((response) => {
+          if (response.status) {
+            console.log(response.data);
+            disabledState.submitState = true;
+            disabledState.alert.hidden = false;
+            disabledState.alert.severity = "success";
+            disabledState.alert.message = response.data;
+            setDisabledState({ ...disabledState });
+          } else {
+            console.log("Error processing request");
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
+
+    setFormState({ ...formState });
+  };
+
+  const validateForm = () => {
+    disabledState.errors = 0;
+
+    Object.keys(formState).forEach((key) => {
+      if (formState[key] === "") {
+        disabledState[key] = true;
+        disabledState.errors++;
+      } else {
+        disabledState[key] = false;
+      }
+      setDisabledState({ ...disabledState });
+    });
   };
 
   return (
     <Wrapper className="contact">
-      ``
       <Typography variant="h4" component="h4">
-        Manage Product Item:{" "}
-        <b>
-          <i>{productInfo.product_name}</i>
-        </b>
+        Add New Supplier
       </Typography>
       <div className="row align-items-center my-5">
         <div className="col-lg-2">
@@ -130,27 +149,19 @@ function ManageProducts() {
             <div>
               <TextField
                 id="pname"
+                error={disabledState.code}
                 label="Product Name"
                 onChange={(e) => handleFormChange(e)}
                 fullWidth
-                value={productInfo.product_name}
               />
-
-              <Tooltip
-                color="error"
-                placement="right"
-                title={
-                  <h5 style={{ color: "white" }}>
-                    This field cannot be changed!
-                  </h5>
-                }
-              >
-                <TextField
+              <Tooltip title="Only Approved Suppliers" placement="right">
+                <Autocomplete
+                  onSelect={(e) => handleFormChange(e)}
+                  options={[...new Set(data.map((item) => item.company_name))]}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Approved Supplier" />
+                  )}
                   id="supplier"
-                  label="Supplier Company"
-                  fullWidth
-                  value={productInfo.company_name}
-                  disabled
                 />
               </Tooltip>
               <Tooltip
@@ -165,7 +176,6 @@ function ManageProducts() {
                     <TextField {...params} label="Product Type" />
                   )}
                   placeholder="Search within list, or enter new category"
-                  value={productInfo.category}
                 />
               </Tooltip>
             </div>
@@ -178,23 +188,25 @@ function ManageProducts() {
       <div style={{ paddingTop: "2rem" }} className="row">
         <div className="col-lg-4">
           <TextField
+            disabled={disabledState.textFieldDisabled}
             id="code"
+            error={disabledState.code}
             label="Product Code"
             variant="filled"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            value={productInfo.product_code}
           />
         </div>
         <div className="col-lg-4">
           <TextField
+            disabled={disabledState.textFieldDisabled}
+            error={disabledState.manu}
             // id="filled-error"
             label="Manufacturer"
             variant="filled"
             id="manu"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            value={productInfo.manufacturer}
           />
         </div>
       </div>
@@ -204,6 +216,8 @@ function ManageProducts() {
             Product Description:
           </Typography>
           <TextField
+            disabled={disabledState.textFieldDisabled}
+            error={disabledState.desc}
             // id="filled-error"
             label="Product Description"
             variant="filled"
@@ -213,13 +227,14 @@ function ManageProducts() {
             size="large"
             multiline={true}
             rows={3}
-            value={productInfo.description}
           />
         </div>
       </div>
       <div className="row">
         <div className="col-lg-4">
           <TextField
+            disabled={disabledState.textFieldDisabled}
+            error={disabledState.desc}
             label="Price"
             variant="filled"
             type="number"
@@ -230,7 +245,7 @@ function ManageProducts() {
             inputProps={{ min: 0 }}
             multiline={true}
             fullWidth
-            value={productInfo.unit_price || 0}
+            defaultValue={0}
           />
         </div>
       </div>
@@ -242,6 +257,7 @@ function ManageProducts() {
           >
             <TextField
               sx={{ pt: 2 }}
+              disabled={disabledState.textFieldDisabled}
               // error={disabledState.alert}
               label="Stock Alert Level"
               type="number"
@@ -250,9 +266,9 @@ function ManageProducts() {
               inputProps={{
                 min: 0,
               }}
+              value={formState.alert}
               onChange={(e) => handleFormChange(e)}
               fullWidth
-              value={productInfo.alert_level}
             />
           </Tooltip>
         </div>
@@ -264,12 +280,16 @@ function ManageProducts() {
               sx={{ width: 250 }}
               variant="contained"
               onClick={handleSubmit}
+              hidden={disabledState.submitState}
               color="success"
             >
-              Update Product
+              Create New Product
             </Button>
-            <Alert hidden={alertState.isHidden} severity={alertState.severity}>
-              {alertState.message}
+            <Alert
+              hidden={disabledState.alert.hidden}
+              severity={disabledState.alert.severity}
+            >
+              {disabledState.alert.message}
             </Alert>
           </Stack>
         </div>

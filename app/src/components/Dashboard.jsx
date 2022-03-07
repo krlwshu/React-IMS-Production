@@ -35,12 +35,6 @@ export default function Dashboard() {
     }
   });
 
-  const myData = [
-    { name: "Group A", value: 900 },
-    { name: "Group B", value: 400 },
-    { name: "Group C", value: 300 },
-  ];
-
   const [loadingDataAlerts, setLoadingDataAlerts] = useState(true);
   const [alertingData, setAlertingData] = useState([]);
 
@@ -81,59 +75,41 @@ export default function Dashboard() {
     <Wrapper className="dashboard">
       <h1>Inventory Dashboard</h1>
       <div className="row">
-        <div className="col-lg-6">
-          {loadingDash === false && (
-            <div style={{ height: 500 }}>
-              {loadingDash === false && <DashPie data={dashData} />}
-            </div>
-          )}
-        </div>
-        <div className="col-lg-3">
+        <div className="col-lg-4">
           <Card sx={{ p: 5, radius: 5 }}>
-            <Stack direction="row">
-              <HourglassBottomOutlinedIcon
-                color="primary"
-                sx={{ fontSize: 40 }}
-                aria-label=""
-              ></HourglassBottomOutlinedIcon>
-              <Typography
-                sx={{ pl: 5 }}
-                variant="h5"
-                component="h5"
-                color="primary"
-              >
-                Awaiting IM Approval
-              </Typography>
-            </Stack>
-            <List
-              sx={{
-                width: "100%",
-                maxWidth: 360,
-                bgcolor: "background.paper",
-              }}
+            <Typography
+              sx={{ pl: 5 }}
+              variant="h5"
+              component="h5"
+              color="primary"
             >
-              {data
-                .filter((item) => item.supplier_approval_status === "Partial")
-                .map((item) => (
-                  <React.Fragment key={item.id}>
-                    <ListItem key={item.id}>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <RouterIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={`#${item.id} ${item.company_name}`}
-                        secondary={`${item.supp_avail_qty}/${item.requested_quantity} available (${item.product_code})`}
-                      />
-                    </ListItem>
-                    <Divider />
-                  </React.Fragment>
-                ))}
-            </List>
+              Order Status
+            </Typography>
+            {loadingDash === false && (
+              <div style={{ height: 300 }}>
+                <DashPie data={dashData} />
+              </div>
+            )}
           </Card>
         </div>
-        <div className="col-lg-3">
+        <div className="col-lg-4">
+          <Card sx={{ p: 5, radius: 5 }}>
+            <Typography
+              sx={{ pl: 5 }}
+              variant="h5"
+              component="h5"
+              color="primary"
+            >
+              Order Status
+            </Typography>
+            {loadingDash === false && (
+              <div style={{ height: 300 }}>
+                <DashPie data={dashData} />
+              </div>
+            )}
+          </Card>
+        </div>
+        <div className="col-lg-4">
           <Card sx={{ p: 5, radius: 5 }}>
             <Stack direction="row">
               <HourglassBottomOutlinedIcon
@@ -178,8 +154,51 @@ export default function Dashboard() {
             </List>
           </Card>
         </div>
-      </div>
-      <div className="row ">
+        <div className="col-lg-4">
+          <Card sx={{ p: 5, radius: 5 }}>
+            <Stack direction="row">
+              <HourglassBottomOutlinedIcon
+                color="primary"
+                sx={{ fontSize: 40 }}
+                aria-label=""
+              ></HourglassBottomOutlinedIcon>
+              <Typography
+                sx={{ pl: 5 }}
+                variant="h5"
+                component="h5"
+                color="primary"
+              >
+                Awaiting IM Approval
+              </Typography>
+            </Stack>
+            <List
+              sx={{
+                width: "100%",
+                maxWidth: 360,
+                bgcolor: "background.paper",
+              }}
+            >
+              {data
+                .filter((item) => item.supplier_approval_status === "Partial")
+                .map((item) => (
+                  <React.Fragment key={item.id}>
+                    <ListItem key={item.id}>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <RouterIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={`#${item.id} ${item.company_name}`}
+                        secondary={`${item.supp_avail_qty}/${item.requested_quantity} available (${item.product_code})`}
+                      />
+                    </ListItem>
+                    <Divider />
+                  </React.Fragment>
+                ))}
+            </List>
+          </Card>
+        </div>
         <div className="col-lg-6">
           <Card sx={{ p: 5, radius: 5 }}>
             <Stack direction="row">

@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-dom";
+import store from './redux/store'
+import { Provider } from 'react-redux'
+
 import useToken from './components/auth/useToken';
 import axios from 'axios';
 
@@ -11,17 +14,21 @@ import {
   Navigation,
   Footer,
   ManageProducts,
-  Inventory,
   ManageOrders,
   SupplierManageOrders,
   Dashboard,
-  SearchEngine
+  Inventory,
+  InventorySearch,
+  TestRedux,
+  ManageSuppliers
 } from "./components";
 
 
 
 
 const App = () => {
+
+  let { slug } = useParams();
 
   // const { setToken, verifyAuth } = useToken();
 
@@ -37,10 +44,12 @@ const App = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/manageproducts" element={<ManageProducts />} />
+        <Route path="/manageproducts/:slug" element={<ManageProducts />} />
+        <Route path="/managesuppliers" element={<ManageSuppliers />} />
         <Route path="/supplierorders" element={<SupplierManageOrders />} />
         <Route path="/manageorders" element={<ManageOrders />} />
-        <Route path="/searchEngine" element={<SearchEngine />} />
+        <Route path="/inventory" element={<InventorySearch />} />
+        <Route path="/testredux" element={<TestRedux />} />
       </Routes>
       <Footer />
     </Router>
@@ -51,7 +60,9 @@ const App = () => {
 //  export default App;
 
 ReactDOM.render(
-  <App />
+  <Provider store={store}>
+    <App />
+  </Provider>
   ,
   document.getElementById("root")
 );
