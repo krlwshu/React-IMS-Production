@@ -7,8 +7,12 @@ import axios from "axios";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
 import { useLocation, useParams } from "react-router-dom";
+import useToken from "./auth/useToken";
 
 function ManageProducts() {
+  // get token
+  const { token } = useToken();
+
   //Get product ID
   const location = useLocation();
   const { slug } = useParams();
@@ -50,10 +54,16 @@ function ManageProducts() {
 
   useEffect(() => {
     async function getData() {
-      await axios.post("/getProductDetails", { id: slug }).then(({ data }) => {
-        setProductInfo(data);
-        setLoadingData(false);
-      });
+      await axios
+        .post(
+          "/getProductDetails",
+          { id: slug },
+          { headers: { "x-access-token": JSON.parse(token) } }
+        )
+        .then(({ data }) => {
+          setProductInfo(data);
+          setLoadingData(false);
+        });
     }
     if (loadingData) {
       getData();

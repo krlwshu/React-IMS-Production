@@ -207,8 +207,9 @@ app.post('/getOrderItems', async (req, res) => {
 });
 
 
-app.post('/getProductDetails', (req, res) => {
+app.post('/getProductDetails', verifyJWT, (req, res) => {
 
+  console.log(req.headers["x-access-token"])
   const { id } = req.body
 
   const sql = `SELECT 
