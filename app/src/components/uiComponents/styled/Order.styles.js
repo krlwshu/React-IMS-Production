@@ -23,6 +23,6 @@ export const StyledBox = styled(Box)`
 
 export const StyledContainer = styled.div`
 &&{  
-    width:80%;
+    // width:80%;
     margin: 0 10% ;
 `;

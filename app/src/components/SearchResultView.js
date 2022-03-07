@@ -76,12 +76,9 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
     <li className="sui-result">
       <div onClick={onClickLink} className="sui-result__header">
 
-        {/* <a class="sui-result__title sui-result__title-link" href="504" target="_blank" rel="noopener noreferrer">Naginbhai Patel</a>         */}
-        <a className="sui-result__title-link" href={"viewProduct?product=" + result.id.raw}>
+        <a className="sui-result__title-link" href={`manageProducts/${result.id.raw}`}>
           <span
             className="sui-result__title"
-            // Snippeted results contain search term highlights with html and are
-            // 100% safe and santitized, so we dangerously set them here
             dangerouslySetInnerHTML={{ __html: result.description.snippet }}
           />
         </a>

@@ -171,6 +171,7 @@ app.post('/getOrderItems', async (req, res) => {
     let productSql = `
         select
         oi.id as id,
+        p.product_name,
         o.id as parent_order,
         DATE_FORMAT(o.date_created, '%Y-%d-%d %H:%i') as date_created,
         s.company_name,
@@ -179,6 +180,7 @@ app.post('/getOrderItems', async (req, res) => {
         oi.supplier_approval_status,
         p.manufacturer,
         oi.im_approval,
+        p.description,
         oi.supp_avail_qty,
         IF(oi.supp_avail_qty IS null, oi.requested_quantity, oi.supp_avail_qty) AS available
         FROM orders o
@@ -203,6 +205,49 @@ app.post('/getOrderItems', async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+
+app.post('/getProductDetails', (req, res) => {
+
+  const { id } = req.body
+
+  const sql = `SELECT 
+  p.product_name,
+  ci.name AS company_name,
+  p.category,
+  product_code,
+  manufacturer,
+  description,
+  unit_price,
+  alert_level,
+  s.id
+  FROM products p 
+  LEFT JOIN suppliers s ON s.id = p.supplier_id
+  LEFT JOIN company_info ci ON ci.id = s.company_id
+  
+  WHERE p.id = ?`
+
+  db.query(sql, id, (err, results) => {
+    if (err) {
+      res.send(500)
+    } else {
+      if (results.length) {
+
+        res.json(results[0])
+      } else {
+        res.json({ err: "nodata" })
+      }
+
+
+    } // ok so were not seeing a 500...good!
+
+  })
+
+  // done
+
+})
+
+
 
 // Handles Approve, Reject and Partial approvals 
 // if full Approve, updates current stock level
@@ -311,17 +356,18 @@ app.post('/createNewProduct', async (req, res) => {
 
 const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
-  let { code, desc, type, manu } = data.formState;
+  console.log(data.formState)
+  let { code, desc, type, manu, pname, alert, price } = data.formState;
   let supplierId = data.supplierId;
 
   let newProductSql = `
-  insert into products (supplier_id, category, product_code, description, manufacturer) values 
-  (?,?,?,?,?)
+  insert into products (supplier_id, category, product_code, description, manufacturer, product_name, alert_level, unit_price) values 
+  (?,?,?,?,?,?,?,?)
   `;
 
-  db.query(newProductSql, [supplierId, type, code, desc, manu], (err, results) => {
+  db.query(newProductSql, [supplierId, type, code, desc, manu, pname, alert, price], (err, results) => {
     if (err) {
-      console.log(err);
+      console.log(err)
       return reject(false)
     } else {
       return resolve("New Product Created!");
