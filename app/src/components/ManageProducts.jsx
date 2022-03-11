@@ -6,7 +6,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useToken from "./auth/useToken";
 
 function ManageProducts() {
@@ -14,7 +14,6 @@ function ManageProducts() {
   const { token } = useToken();
 
   //Get product ID
-  const location = useLocation();
   const { slug } = useParams();
 
   // Load existing product data
@@ -82,11 +81,19 @@ function ManageProducts() {
     getData();
   }, []);
 
-  const handleFormChange = (e) => {};
+  const handleFormChange = (e) => {
+    const productinfo = {
+      ...productInfo,
+      [e.target.id]: e.target.value,
+    };
+
+    setProductInfo(productinfo);
+    console.log(productInfo);
+  };
 
   const handleSubmit = () => {
     axios
-      .post("/createNewProduct", { productInfo })
+      .post("/updateProduct", { productInfo })
       .then((response) => {
         if (response.status) {
         } else {
@@ -100,7 +107,6 @@ function ManageProducts() {
 
   return (
     <Wrapper className="contact">
-      ``
       <Typography variant="h4" component="h4">
         Manage Product Item:{" "}
         <b>
@@ -139,9 +145,9 @@ function ManageProducts() {
           >
             <div>
               <TextField
-                id="pname"
+                id="product_name"
                 label="Product Name"
-                onChange={(e) => handleFormChange(e)}
+                onChange={handleFormChange}
                 fullWidth
                 value={productInfo.product_name}
               />
@@ -188,12 +194,12 @@ function ManageProducts() {
       <div style={{ paddingTop: "2rem" }} className="row">
         <div className="col-lg-4">
           <TextField
-            id="code"
+            id="product_code"
             label="Product Code"
             variant="filled"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            value={productInfo.product_code}
+            defaultValue={productInfo.product_code}
           />
         </div>
         <div className="col-lg-4">
@@ -201,10 +207,10 @@ function ManageProducts() {
             // id="filled-error"
             label="Manufacturer"
             variant="filled"
-            id="manu"
+            id="manufacturer"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            value={productInfo.manufacturer}
+            defaultValue={productInfo.manufacturer}
           />
         </div>
       </div>
@@ -217,13 +223,13 @@ function ManageProducts() {
             // id="filled-error"
             label="Product Description"
             variant="filled"
-            id="desc"
+            id="description"
             onChange={(e) => handleFormChange(e)}
             fullWidth
             size="large"
             multiline={true}
             rows={3}
-            value={productInfo.description}
+            defaultValue={productInfo.description}
           />
         </div>
       </div>
@@ -233,14 +239,14 @@ function ManageProducts() {
             label="Price"
             variant="filled"
             type="number"
-            id="price"
+            id="unit_price"
             onChange={(e) => handleFormChange(e)}
             sx={{ pt: 2 }}
             size="large"
             inputProps={{ min: 0 }}
             multiline={true}
             fullWidth
-            value={productInfo.unit_price || 0}
+            value={productInfo.unit_price}
           />
         </div>
       </div>
@@ -256,7 +262,7 @@ function ManageProducts() {
               label="Stock Alert Level"
               type="number"
               variant="filled"
-              id="alert"
+              id="alert_level"
               inputProps={{
                 min: 0,
               }}

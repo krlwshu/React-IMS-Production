@@ -6,6 +6,15 @@ const cors = require('cors');
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+// Enterprise search
+const AppSearchClient = require('@elastic/app-search-node')
+const apiKey = 'private-3gtefuokjhicde8at5oyz1re'
+const baseUrlFn = () => 'http://192.168.44.132:3002/api/as/v1/'
+const client = new AppSearchClient(undefined, apiKey, baseUrlFn)
+const engineName = 'ims-search-engine'
+
+const axios = require('axios');
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => console.log(`Listening on port ${port}`));
 }
@@ -46,7 +55,7 @@ app.use('/login', (req, res) => {
         if (results.length > 0 && verifyPass(pass, results[0].password)) {
           const id = results[0].id;
           const token = jwt.sign({ id }, "jwtSecret", {
-            expiresIn: 300
+            expiresIn: 30000
           })
 
           // req.session.user = results;
@@ -213,6 +222,7 @@ app.post('/getProductDetails', verifyJWT, (req, res) => {
   const { id } = req.body
 
   const sql = `SELECT 
+  p.id,
   p.product_name,
   ci.name AS company_name,
   p.category,
@@ -221,7 +231,7 @@ app.post('/getProductDetails', verifyJWT, (req, res) => {
   description,
   unit_price,
   alert_level,
-  s.id
+  s.id as supplier_id
   FROM products p 
   LEFT JOIN suppliers s ON s.id = p.supplier_id
   LEFT JOIN company_info ci ON ci.id = s.company_id
@@ -340,7 +350,7 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
 
 
 
-// Create new product
+// Create / update new product
 
 app.post('/createNewProduct', async (req, res) => {
 
@@ -354,6 +364,8 @@ app.post('/createNewProduct', async (req, res) => {
   }
 
 });
+
+
 
 const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
@@ -377,9 +389,51 @@ const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 });
 
 
+app.post('/updateProduct', async (req, res) => {
+
+  const { productInfo } = req.body;
+  try {
+    const newProduct = await updateProduct(productInfo);
+    console.log("product updated")
+    res.status(200).json([newProduct]);
+  } catch (e) {
+    console.log("Error updating product");
+    res.status(500).json(e)
+  }
+
+});
+
+const updateProduct = (data, qty) => new Promise((resolve, reject) => {
+
+  let { product_name, category, product_code, manufacturer, description, alert_level, unit_price, id } = data;
+
+
+  let newProductSql = `
+    update products set
+    category = ?, 
+    product_code = ?, 
+    description = ?,
+    manufacturer = ?, 
+    product_name = ?, 
+    alert_level = ?, 
+    unit_price = ? 
+    where id = ? 
+  `;
+
+  db.query(newProductSql, [category, product_code, description, manufacturer, product_name, alert_level, unit_price, id], (err, results) => {
+    if (err) {
+      console.log(err)
+      return reject(false)
+    } else {
+      return resolve("New Product Created!");
+    }
+  });
+});
+
+
 // Get order updates - dashboard feed
 
-app.post('/getOrderUpdates', async (req, res) => {
+app.get('/getOrderUpdates', verifyJWT, async (req, res) => {
 
   try {
 
@@ -413,7 +467,7 @@ app.post('/getOrderUpdates', async (req, res) => {
     res.sendStatus(500);
   }
 });
-app.post('/getDashData', async (req, res) => {
+app.get('/getDashData', verifyJWT, async (req, res) => {
 
   try {
 
@@ -571,7 +625,7 @@ async function notifySupplierByEmail(order) {
 
 
 
-app.post('/getAlerting', async (req, res) => {
+app.get('/getAlerting', verifyJWT, async (req, res) => {
 
   try {
 
@@ -626,7 +680,89 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
 });
 
 
+// Sync search engine, get data from db - POST will apply new field updates similar to PATCH
 
+app.post('/searchSync', async (req, res) => {
+
+  let sql = `SELECT 
+    p.id,
+    p.product_name,
+    ci.name AS company_name,
+    p.category,
+    product_code,
+    manufacturer,
+    description,
+    unit_price,
+    alert_level,
+    s.company_name as supplier,
+    s.id AS supplier_id
+    FROM products p 
+    LEFT JOIN suppliers s ON s.id = p.supplier_id
+    LEFT JOIN company_info ci ON ci.id = s.company_id`;
+
+  let productData = await runQuery(sql);
+
+  if (productData.length > 0) {
+    let syncStatus = await reIndexData(productData)
+
+    res.send(syncStatus)
+  } else {
+    res.send({ msg: "Nothing to update" })
+  }
+
+}
+);
+
+
+// Post data to engine
+const reIndexData = (docs) => new Promise((resolve, reject) => {
+  client
+    .indexDocuments(engineName, docs)
+    .then(response => { return resolve(response) })
+    .catch(error => { console.log(error); return reject(error) })
+})
+
+
+
+// Delete document from search engine index - expects array in req.body.docId only
+app.get('/deleteDocuments', verifyJWT, async (req, res) => {
+
+  let { docId } = req.body;
+
+  client
+    // .getDocuments(engineName, [97])
+    .destroyDocuments(engineName, docId)
+    .then((response) => {
+      res.send(response)
+
+    })
+    .catch(error => console.log(error.errorMessages))
+
+})
+
+
+//  test query suggestion
+
+app.post('/querySuggestor', verifyJWT, async (req, res) => {
+
+  const { searchKey } = req.body;
+
+  const options = {
+    size: 5,
+    types: {
+      documents: {
+        fields: ['company_name']
+      }
+    }
+  }
+
+  client
+    .querySuggestion(engineName, searchKey, options)
+    .then(response => res.json(response))
+    .catch(error => { console.log(error.errorMessages); res.send(500) })
+
+}
+);
 
 
 
