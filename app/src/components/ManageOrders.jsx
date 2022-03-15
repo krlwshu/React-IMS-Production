@@ -21,10 +21,12 @@ function ManageOrders() {
   const [data, setData] = useState([]);
 
   async function getData() {
-    await axios.post("/getOrderItems", { supplierId: 0 }).then(({ data }) => {
-      setData(data);
-      setLoadingData(false);
-    });
+    await axios
+      .post("http://localhost:5000/getOrderItems", { supplierId: 0 })
+      .then(({ data }) => {
+        setData(data);
+        setLoadingData(false);
+      });
   }
 
   useEffect(() => {
@@ -102,7 +104,7 @@ function OrderTable(props) {
   // Send order to server (generic function)
   const processItemOrderUpdate = (itemId, appStatus) => {
     axios
-      .post("/processOrderApproveCancel", {
+      .post("http://localhost:5000/processOrderApproveCancel", {
         item: itemId,
         appStatus: appStatus,
       })

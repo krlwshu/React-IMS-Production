@@ -16,19 +16,26 @@ import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 // Charts
-
 import DashPie from "./uiComponents/DashPie";
 
+// Headers
+import useToken from "./auth/useToken";
+
 export default function Dashboard() {
+  const { token } = useToken();
+  const headers = { headers: { "x-access-token": JSON.parse(token) } };
+
   const [loadingData, setLoadingData] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
     async function getData() {
-      await axios.post("/getOrderUpdates").then(({ data }) => {
-        setData(data);
-        setLoadingData(false);
-      });
+      await axios
+        .get("http://localhost:5000/getOrderUpdates", headers)
+        .then(({ data }) => {
+          setData(data);
+          setLoadingData(false);
+        });
     }
     if (loadingData) {
       getData();
@@ -43,10 +50,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getData() {
-      await axios.post("/getAlerting").then(({ data }) => {
-        setAlertingData(data);
-        setLoadingDataAlerts(false);
-      });
+      await axios
+        .get("http://localhost:5000/getAlerting", headers)
+        .then(({ data }) => {
+          setAlertingData(data);
+          setLoadingDataAlerts(false);
+        });
     }
     if (loadingDataAlerts) {
       getData();
@@ -55,11 +64,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getData() {
-      await axios.post("/getDashData").then(({ data }) => {
-        setDashData(data);
-        setLoadingash(false);
-        console.log(data);
-      });
+      await axios
+        .get("http://localhost:5000/getDashData", headers)
+        .then(({ data }) => {
+          setDashData(data);
+          setLoadingash(false);
+          console.log(data);
+        });
     }
     if (loadingDataAlerts) {
       getData();

@@ -50,11 +50,13 @@ export default function DataTable() {
     const filter = {
       supplierId: parseInt(localStorage.getItem("supplier_id")),
     };
-    await axios.post("/getOrderItems", filter).then(({ data }) => {
-      setOrderData(data);
-      setLoadingData(false);
-      setReloadState(false);
-    });
+    await axios
+      .post("http://localhost:5000/getOrderItems", filter)
+      .then(({ data }) => {
+        setOrderData(data);
+        setLoadingData(false);
+        setReloadState(false);
+      });
     console.log("fetched");
   }
 
@@ -200,7 +202,7 @@ export default function DataTable() {
   // Send order to server (generic function)
   const submitOrderResponse = (data) => {
     axios
-      .post("/processOrderItem", data)
+      .post("http://localhost:5000/processOrderItem", data)
       .then((response) => {
         if (response.status) {
           setReloadState(true);

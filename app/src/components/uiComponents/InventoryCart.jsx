@@ -27,7 +27,7 @@ import Slide from "@mui/material/Slide";
 // Axios - posting order data to server
 import axios from "axios";
 
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, ButtonGroup } from "@mui/material";
 
 // Redux part
 import { useSelector, useDispatch } from "react-redux";
@@ -63,7 +63,7 @@ export default function InventoryCart(props) {
   // Handle order submit
   const handleSubmit = () => {
     axios
-      .post("/submitOrder", items)
+      .post("http://localhost:5000/submitOrder", items)
       .then((response) => {
         if (response) {
           orderProcessStatus.showAlert = true;
@@ -86,6 +86,9 @@ export default function InventoryCart(props) {
 
   const handleClickOpen = () => {
     setOpen(true);
+  };
+  const handleEmptyCart = () => {
+    dispatch(resetCart());
   };
 
   const handleClose = () => {
@@ -160,10 +163,27 @@ export default function InventoryCart(props) {
             pt={2}
             direction="row"
           >
-            <Button variant="contained" onClick={handleClickOpen}>
-              Submit
-            </Button>
-            <Button variant="outlined">Remove All Items</Button>
+            <ButtonGroup
+              hidden={itemCount === 0 ? true : false}
+              variant="text"
+              color="primary"
+              aria-label=""
+            >
+              <Button
+                sx={{ mr: 1 }}
+                variant="contained"
+                onClick={handleClickOpen}
+              >
+                Submit
+              </Button>
+              <Button
+                sx={{ ml: 1 }}
+                onClick={handleEmptyCart}
+                variant="outlined"
+              >
+                Remove All Items
+              </Button>
+            </ButtonGroup>
           </Stack>
           <Alert hidden={!orderProcessStatus.showAlert} severity="success">
             Order processed! Order IDs:

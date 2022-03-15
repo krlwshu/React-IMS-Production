@@ -37,6 +37,14 @@ const styles = {
   chipActive: {
     backgroundColor: "#79ff25",
     color: "white"
+  },
+  chipAlert: {
+    backgroundColor: "rgb(234 112 57)",
+    color: "white"
+  },
+  chipOk: {
+    backgroundColor: "#79ff25",
+    color: "white"
   }
 };
 
@@ -69,6 +77,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
   // Current item in cart
   const itemsInCart = items.filter(item => item.id === result.id.raw)
     .map(item => item.requested_quantity)[0] || 0;
+
 
   return (
 
@@ -142,9 +151,9 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             <li>
               <span className="sui-result__key">Quantity</span>{" "}
               <Chip style={
-                result.category.raw ? styles.chipActive : styles.chipInactive}
+                result.qty_avail.raw < result.alert_level.raw ? styles.chipAlert : styles.chipOk}
                 className="sui-result__value"
-                label="use for alert"
+                label={result.qty_avail.raw}
                 size="small"
                 color="primary"
               />

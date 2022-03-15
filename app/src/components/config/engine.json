@@ -8,6 +8,7 @@
     "category",
     "product_code",
     "supplier_id",
+    "alert_level",
     "manufacturer",
     "qty_avail",
     "id"
@@ -18,6 +19,7 @@
     "category",
     "manufacturer",
     "product_code",
+    "alert_level",
     "qty_avail"
   ],
   "titleField": "description",
