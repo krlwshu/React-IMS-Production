@@ -72,9 +72,11 @@ function ManageProducts() {
   const [data, setData] = useState([]);
 
   async function getData() {
-    await axios.post("/getSuppliersProductTypes").then(({ data }) => {
-      setData(data);
-    });
+    await axios
+      .post("http://localhost:5000/getSuppliersProductTypes")
+      .then(({ data }) => {
+        setData(data);
+      });
   }
 
   useEffect(() => {
@@ -93,7 +95,7 @@ function ManageProducts() {
 
   const handleSubmit = () => {
     axios
-      .post("/updateProduct", { productInfo })
+      .post("http://localhost:5000/updateProduct", { productInfo })
       .then((response) => {
         if (response.status) {
         } else {
@@ -199,7 +201,7 @@ function ManageProducts() {
             variant="filled"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            defaultValue={productInfo.product_code}
+            value={productInfo.product_code}
           />
         </div>
         <div className="col-lg-4">
@@ -210,7 +212,7 @@ function ManageProducts() {
             id="manufacturer"
             onChange={(e) => handleFormChange(e)}
             fullWidth
-            defaultValue={productInfo.manufacturer}
+            value={productInfo.manufacturer}
           />
         </div>
       </div>
@@ -229,7 +231,7 @@ function ManageProducts() {
             size="large"
             multiline={true}
             rows={3}
-            defaultValue={productInfo.description}
+            value={productInfo.description}
           />
         </div>
       </div>

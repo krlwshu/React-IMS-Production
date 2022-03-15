@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from "react";
-import styled from 'styled-components'
-import { useTable, useGroupBy, useExpanded, useFilters,useGlobalFilter, useSortBy } from 'react-table'
+import styled from "styled-components";
+import {
+  useTable,
+  useGroupBy,
+  useExpanded,
+  useFilters,
+  useGlobalFilter,
+  useSortBy,
+} from "react-table";
 import axios from "axios";
-import BTable from 'react-bootstrap/Table';
+import BTable from "react-bootstrap/Table";
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from "@mui/material";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 // import makeData from './makeData'
 
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import {styledInvList} from './styled/inventory-table';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import { styledInvList } from "./styled/inventory-table";
 
-import SearchButton from './SearchButton'
-
+import SearchButton from "./SearchButton";
 
 const Styles = styledInvList;
 
@@ -26,21 +32,19 @@ function useControlledState(state, { instance }) {
         hiddenColumns: [...state.hiddenColumns, ...state.groupBy].filter(
           (d, i, all) => all.indexOf(d) === i
         ),
-      }
+      };
     }
-    return state
-  }, [state])
+    return state;
+  }, [state]);
 }
 
 function Table({ columns, data }) {
-
-
   const [filterInput, setFilterInput] = useState("");
 
   // Update the state when input changes
-  const handleFilterChange = e => {
+  const handleFilterChange = (e) => {
     const value = e.target.value || undefined;
-    setFilter("description", value); 
+    setFilter("description", value);
     setFilterInput(value);
   };
 
@@ -63,38 +67,41 @@ function Table({ columns, data }) {
     useSortBy,
     useExpanded,
     // Our custom plugin to add the expander column
-    hooks => {
-      hooks.useControlledState.push(useControlledState)
+    (hooks) => {
+      hooks.useControlledState.push(useControlledState);
       hooks.visibleColumns.push((columns, { instance }) => {
         if (!instance.state.groupBy.length) {
-          return columns
+          return columns;
         }
 
         return [
           {
-            id: 'expander', // Make sure it has an ID
+            id: "expander", // Make sure it has an ID
             // Build our expander column
             Header: ({ allColumns, state: { groupBy } }) => {
-              return groupBy.map(columnId => {
-                const column = allColumns.find(d => d.id === columnId)
+              return groupBy.map((columnId) => {
+                const column = allColumns.find((d) => d.id === columnId);
 
                 return (
                   <span {...column.getHeaderProps()}>
                     {column.canGroupBy ? (
                       // If the column can be grouped, let's add a toggle
                       <span {...column.getGroupByToggleProps()}>
-                        {column.isGrouped ? <ArrowRightIcon fontSize="5"/> : <ArrowDropDownIcon fontSize="5"/>}
+                        {column.isGrouped ? (
+                          <ArrowRightIcon fontSize="5" />
+                        ) : (
+                          <ArrowDropDownIcon fontSize="5" />
+                        )}
                       </span>
                     ) : null}
-                    {column.render('Header')}{' '}
+                    {column.render("Header")}{" "}
                   </span>
-
-                )
-              })
+                );
+              });
             },
             Cell: ({ row }) => {
               if (row.canExpand) {
-                const groupedCell = row.allCells.find(d => d.isGrouped)
+                const groupedCell = row.allCells.find((d) => d.isGrouped);
 
                 return (
                   <span
@@ -107,26 +114,29 @@ function Table({ columns, data }) {
                       },
                     })}
                   >
-                    {row.isExpanded ? <ArrowDropDownIcon fontSize="5"/>:<ArrowRightIcon fontSize="5"/>} {groupedCell.render('Cell')}{' '}
-                    ({row.subRows.length})
+                    {row.isExpanded ? (
+                      <ArrowDropDownIcon fontSize="5" />
+                    ) : (
+                      <ArrowRightIcon fontSize="5" />
+                    )}{" "}
+                    {groupedCell.render("Cell")} ({row.subRows.length})
                   </span>
-                )
+                );
               }
 
-              return null
+              return null;
             },
           },
           ...columns,
-        ]
-      })
+        ];
+      });
     }
-  )
+  );
 
-  const firstPageRows = rows.slice(0, 10)
+  const firstPageRows = rows.slice(0, 10);
 
   return (
     <>
-
       <SearchButton
         value={filterInput}
         onChange={handleFilterChange}
@@ -136,18 +146,24 @@ function Table({ columns, data }) {
       {/* <Legend /> */}
       <table {...getTableProps()}>
         <thead>
-          {headerGroups.map(headerGroup => (
+          {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()} className={column.className ? column.className : "" }>
-                  
+              {headerGroup.headers.map((column) => (
+                <th
+                  {...column.getHeaderProps()}
+                  className={column.className ? column.className : ""}
+                >
                   {column.canGroupBy ? (
                     // If the column can be grouped, let's add a toggle
                     <span {...column.getGroupByToggleProps()}>
-                      {column.isGrouped ?  <ArrowRightIcon fontSize="5"/> :  <ArrowDropDownIcon fontSize="5"/> }
+                      {column.isGrouped ? (
+                        <ArrowRightIcon fontSize="5" />
+                      ) : (
+                        <ArrowDropDownIcon fontSize="5" />
+                      )}
                     </span>
                   ) : null}
-                  {column.render('Header')}
+                  {column.render("Header")}
                 </th>
               ))}
             </tr>
@@ -155,10 +171,10 @@ function Table({ columns, data }) {
         </thead>
         <tbody {...getTableBodyProps()}>
           {firstPageRows.map((row, i) => {
-            prepareRow(row)
+            prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
+                {row.cells.map((cell) => {
                   return (
                     <td
                       // For educational purposes, let's color the
@@ -167,29 +183,27 @@ function Table({ columns, data }) {
                       {...cell.getCellProps()}
                       style={{
                         background: cell.isGrouped
-                          ? '#0aff0082'
+                          ? "#0aff0082"
                           : cell.isAggregated
-                          ? 'rgb(224 255 255)'
+                          ? "rgb(224 255 255)"
                           : cell.isPlaceholder
-                          ? '#ff000042'
-                          : 'white',
+                          ? "#ff000042"
+                          : "white",
                       }}
                     >
-
                       {cell.isAggregated
                         ? // If the cell is aggregated, use the Aggregated
                           // renderer for cell
-                          cell.render('Aggregated')
+                          cell.render("Aggregated")
                         : cell.isPlaceholder
                         ? null // For cells with repeated values, render null
-                        : 
-                          // Otherwise, just render the regular cell
-                          cell.render('Cell')}
+                        : // Otherwise, just render the regular cell
+                          cell.render("Cell")}
                     </td>
-                  )
+                  );
                 })}
               </tr>
-            )
+            );
           })}
         </tbody>
       </table>
@@ -200,54 +214,50 @@ function Table({ columns, data }) {
       <br />
       <br />
     </>
-  )
+  );
 }
-
-
 
 function roundedMedian(leafValues) {
-  let min = leafValues[0] || 0
-  let max = leafValues[0] || 0
+  let min = leafValues[0] || 0;
+  let max = leafValues[0] || 0;
 
-  leafValues.forEach(value => {
-    min = Math.min(min, value)
-    max = Math.max(max, value)
-  })
+  leafValues.forEach((value) => {
+    min = Math.min(min, value);
+    max = Math.max(max, value);
+  });
 
-  return Math.round((min + max) / 2)
+  return Math.round((min + max) / 2);
 }
 
-function ProductsList({setOrderState, orderState}) {
-
-
+function ProductsList({ setOrderState, orderState }) {
   const handleAddItem = (row) => {
     setOrderState((prev) => {
-      const isItemInCart = prev.find((item) => item.prod_id === row.original.id);
+      const isItemInCart = prev.find(
+        (item) => item.prod_id === row.original.id
+      );
 
       if (isItemInCart) {
         return prev.map((item) =>
-          item.id === row.original.id
-            ? { ...item, qty: item.qty + 1 }
-            : item
+          item.id === row.original.id ? { ...item, qty: item.qty + 1 } : item
         );
       }
 
-      return [...prev, { ...orderState, 
-        id: row.original.id,
-                prod_id: row.original.id, 
-            product: row.original.product_code,
-            qty: 1,
-            supplier: row.original.supplier,
-            manufacturer: row.original.manufacturer,
-            description: row.original.description,
-            supplier_id: row.original.supplier_id,
-      
-      }];
+      return [
+        ...prev,
+        {
+          ...orderState,
+          id: row.original.id,
+          prod_id: row.original.id,
+          product: row.original.product_code,
+          qty: 1,
+          supplier: row.original.supplier,
+          manufacturer: row.original.manufacturer,
+          description: row.original.description,
+          supplier_id: row.original.supplier_id,
+        },
+      ];
     });
   };
-
-
-      
 
   const handleDeleteItem = (row) => {
     setOrderState((prev) =>
@@ -262,73 +272,73 @@ function ProductsList({setOrderState, orderState}) {
     );
   };
 
-
   const columns = React.useMemo(
     () => [
-
       {
-        Header: 'Supplier',
-        accessor: 'supplier',
-        aggregate: 'uniqueCount',
+        Header: "Supplier",
+        accessor: "supplier",
+        aggregate: "uniqueCount",
         Aggregated: ({ value }) => `${value} Unique Names`,
         maxWidth: 400,
         width: 200,
-        sortType: 'basic'
+        sortType: "basic",
       },
       {
-        Header: 'Product Type',
-        accessor: 'category',
-        aggregate: 'uniqueCount',
+        Header: "Product Type",
+        accessor: "category",
+        aggregate: "uniqueCount",
         Aggregated: ({ value }) => `${value} Unique Products`,
       },
       {
-        Header: 'Manufacturer',
-        accessor: 'manufacturer',
-        aggregate: 'uniqueCount',
+        Header: "Manufacturer",
+        accessor: "manufacturer",
+        aggregate: "uniqueCount",
         Aggregated: ({ value }) => `${value} Unique Products`,
       },
       {
-        Header: 'Description',
-        accessor: 'description',
-        aggregate: 'count',
+        Header: "Description",
+        accessor: "description",
+        aggregate: "count",
         Aggregated: ({ value }) => `${value} Variants`,
-        className: 'desc'
+        className: "desc",
       },
       {
-        Header: 'Qty. In Stock',
-        accessor: 'qty_avail',
-        aggregate: 'sum',
+        Header: "Qty. In Stock",
+        accessor: "qty_avail",
+        aggregate: "sum",
         Aggregated: ({ value }) => `${value} total`,
       },
       {
-        Header: 'Action',
-        accessor: 'action',
-        aggregate: 'count',
-        Aggregated: () => '',
+        Header: "Action",
+        accessor: "action",
+        aggregate: "count",
+        Aggregated: () => "",
         Cell: ({ cell }) => (
           <div>
-            <AddCircleIcon onClick={() => handleAddItem(cell.row)} color="success" /> 
-            <RemoveCircleIcon onClick={() => handleDeleteItem(cell.row)} color="error" />
+            <AddCircleIcon
+              onClick={() => handleAddItem(cell.row)}
+              color="success"
+            />
+            <RemoveCircleIcon
+              onClick={() => handleDeleteItem(cell.row)}
+              color="error"
+            />
           </div>
-
-        )
-      }
+        ),
+      },
     ],
     []
-  )
-
+  );
 
   const [loadingData, setLoadingData] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
     async function getData() {
-      await axios
-        .post("/getProducts")
-        .then(({data}) => {
-          setData(data);
-          setLoadingData(false);
-        });
+      await axios.post("http://localhost:5000/getProducts").then(({ data }) => {
+        setData(data);
+        setLoadingData(false);
+      });
     }
     if (loadingData) {
       getData();
@@ -338,7 +348,7 @@ function ProductsList({setOrderState, orderState}) {
     <Styles>
       <Table columns={columns} data={data} />
     </Styles>
-  )
+  );
 }
 
-export default ProductsList
+export default ProductsList;

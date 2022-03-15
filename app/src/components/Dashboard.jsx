@@ -30,10 +30,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getData() {
-      await axios.get("/getOrderUpdates", headers).then(({ data }) => {
-        setData(data);
-        setLoadingData(false);
-      });
+      await axios
+        .get("http://localhost:5000/getOrderUpdates", headers)
+        .then(({ data }) => {
+          setData(data);
+          setLoadingData(false);
+        });
     }
     if (loadingData) {
       getData();
@@ -48,10 +50,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getData() {
-      await axios.get("/getAlerting", headers).then(({ data }) => {
-        setAlertingData(data);
-        setLoadingDataAlerts(false);
-      });
+      await axios
+        .get("http://localhost:5000/getAlerting", headers)
+        .then(({ data }) => {
+          setAlertingData(data);
+          setLoadingDataAlerts(false);
+        });
     }
     if (loadingDataAlerts) {
       getData();
@@ -60,11 +64,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getData() {
-      await axios.get("/getDashData", headers).then(({ data }) => {
-        setDashData(data);
-        setLoadingash(false);
-        console.log(data);
-      });
+      await axios
+        .get("http://localhost:5000/getDashData", headers)
+        .then(({ data }) => {
+          setDashData(data);
+          setLoadingash(false);
+          console.log(data);
+        });
     }
     if (loadingDataAlerts) {
       getData();

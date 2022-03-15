@@ -1,3 +1,7 @@
+// About server.js
+// This file contains a series of API and backend functions 
+// used to serve data to the front end and process changes to the databases
+
 const express = require('express'); //Line 1
 const app = express(); //Line 2
 const port = process.env.PORT || 5000; //Line 3
@@ -19,11 +23,12 @@ if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => console.log(`Listening on port ${port}`));
 }
 
+// Used for returning JSON to the API caller (typically front end)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-
+// DB connection configration
 const db = mysql.createConnection({
   user: 'root',
   host: 'localhost',
@@ -32,8 +37,8 @@ const db = mysql.createConnection({
 });
 
 
-//Authentication handling, issue token upon successful password verification
 
+//Authentication handling, issue token upon successful password verification
 app.use('/login', (req, res) => {
 
   const user = req.body.username
@@ -42,19 +47,23 @@ app.use('/login', (req, res) => {
   const AUTH_FAILURE = { error: "Auth failure" }
 
 
+  let sql = `select su.*, r.content, r.role_name from sys_users su
+  LEFT JOIN sys_user_roles r on su.role = r.id
+  where email = ? and active = 1 limit 1`
+
   if (pass === '' || user === '') {
     res.status(401).json(AUTH_FAILURE)
   } else {
 
-    db.query("select * from sys_users where email = ? and active = 1 limit 1", user,
+    db.query(sql, user,
       (error, results) => {
         if (error) {
           res.send({ err: error })
         }
         //If (results) and password match, sign token
         if (results.length > 0 && verifyPass(pass, results[0].password)) {
-          const id = results[0].id;
-          const token = jwt.sign({ id }, "jwtSecret", {
+          const { id, role, email, name, content, role_name } = results[0];
+          const token = jwt.sign({ id, role, content, email, name, role_name }, "jwtSecret", {
             expiresIn: 30000
           })
 
@@ -83,7 +92,7 @@ const encrptyPassword = (origPwd) => {
   return encPwd
 }
 
-
+// Middleware function used to verify token and if true resume next function at call site
 const verifyJWT = (req, res, next) => {
 
   const token = req.headers["x-access-token"];
@@ -96,6 +105,11 @@ const verifyJWT = (req, res, next) => {
         res.json({ auth: false, message: "Auth failure" })
       } else {
         req.userId = decoded.id;
+        req.userName = decoded.name;
+        req.email = decoded.email;
+        req.role = decoded.role;
+        req.userType = decoded.role_name;
+        req.content = decoded.content;
         next();
 
       }
@@ -103,74 +117,25 @@ const verifyJWT = (req, res, next) => {
   }
 }
 
+// A simple function used by the front end. Submits token which returns auth status.
 app.get('/authVerify', verifyJWT, (req, res) => {
   res.send({
-    "auth": true,
-    "message": "Authenticated",
-    "id": req.userId
+    auth: true,
+    message: "Authenticated",
+    id: req.userId,
+    email: req.email,
+    userName: req.userName,
+    role: req.role,
+    userType: req.userType,
+    content: req.content.split(",")
   })
 })
 
-
-
-app.post('/authenticate', (req, res) => {
-
-  //Let's do some driven development
-  //Currently the test case is failing, lets make it pass!!! 
-  // <-- Test is on that screen
-
-  const { username, password } = req.body
-
-  const sql = `select * from sys_users where email = ?`
-
-  db.query(sql, username, (err, results) => {
-    if (err) { res.send(500) } // ok so were not seeing a 500...good!
-    if (verifyPass(password, results[0].password)) {
-      res.status(200).json({ authStatus: "Success" })
-    } else {
-      res.status(401).json({ authStatus: "Unauthorized" })
-
-    }
-  })
-
-  // done
-
-})
-
-
-app.post('/getProducts', async (req, res) => {
-  try {
-
-    let productSql = `
-      SELECT 
-      p.id, 
-      category, 
-      product_code, 
-      manufacturer,
-      product_code,
-      description,
-      qty_avail,
-      s.id as supplier_id,
-      s.company_name as supplier
-      
-      FROM products p
-      LEFT JOIN suppliers s ON
-      p.supplier_id = s.id`;
-
-    //Get header data from db and create object tree
-    let products = await runQuery(productSql);
-    res.status(200).json(products);
-  } catch (e) {
-    res.sendStatus(500);
-  }
-});
-
+// Get orders from DB
 app.post('/getOrderItems', async (req, res) => {
 
-  // TEMP FOR PROTO
   const { supplierId } = req.body;
   console.log(supplierId);
-  //
 
   let filter = (supplierId != 0) ? ` where s.id = ${supplierId} ` : '';
 
@@ -202,10 +167,6 @@ app.post('/getOrderItems', async (req, res) => {
         order by o.date_created asc
         `;
 
-    // TEMP FOR PROTO
-
-    //
-    console.log(productSql);
 
     //Get header data from db and create object tree
     let products = await runQuery(productSql);
@@ -215,7 +176,8 @@ app.post('/getOrderItems', async (req, res) => {
   }
 });
 
-
+// The SQL DB acts as main source of truth, any changes propagated to search index must be derived from MYSQL.
+// supplies key product info required by the user
 app.post('/getProductDetails', verifyJWT, (req, res) => {
 
   console.log(req.headers["x-access-token"])
@@ -250,14 +212,11 @@ app.post('/getProductDetails', verifyJWT, (req, res) => {
       }
 
 
-    } // ok so were not seeing a 500...good!
-
+    }
   })
 
-  // done
 
 })
-
 
 
 // Handles Approve, Reject and Partial approvals 
@@ -394,6 +353,7 @@ app.post('/updateProduct', async (req, res) => {
   const { productInfo } = req.body;
   try {
     const newProduct = await updateProduct(productInfo);
+    reIndexData(await getProductByInfo(productInfo.id));
     console.log("product updated")
     res.status(200).json([newProduct]);
   } catch (e) {
@@ -680,15 +640,26 @@ const updateOrderLineItem = (item, status) => new Promise((resolve, reject) => {
 });
 
 
-// Sync search engine, get data from db - POST will apply new field updates similar to PATCH
-
+// Sync search engine, get data from db - used from admin front end, syncs all records
 app.post('/searchSync', async (req, res) => {
+  let productData = await getProductByInfo();
+  if (productData.length > 0) {
+    let syncStatus = await reIndexData(productData)
+    res.send(productData)
+  } else {
+    res.send({ msg: "Nothing to update" })
+  }
+}
+);
+
+const getProductByInfo = (id = 0) => new Promise((resolve, reject) => {
 
   let sql = `SELECT 
     p.id,
     p.product_name,
     ci.name AS company_name,
     p.category,
+    p.qty_avail,
     product_code,
     manufacturer,
     description,
@@ -698,20 +669,21 @@ app.post('/searchSync', async (req, res) => {
     s.id AS supplier_id
     FROM products p 
     LEFT JOIN suppliers s ON s.id = p.supplier_id
-    LEFT JOIN company_info ci ON ci.id = s.company_id`;
+    LEFT JOIN company_info ci ON ci.id = s.company_id `;
 
-  let productData = await runQuery(sql);
+  (id > 0) ? sql += `where p.id = ?` : '';
 
-  if (productData.length > 0) {
-    let syncStatus = await reIndexData(productData)
 
-    res.send(syncStatus)
-  } else {
-    res.send({ msg: "Nothing to update" })
-  }
+  db.query(sql, id,
+    (error, results) => {
+      if (error) {
+        console.log(error)
+        return reject(error);
+      }
+      return resolve(results);
+    });
 
-}
-);
+})
 
 
 // Post data to engine

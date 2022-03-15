@@ -18,3 +18,5 @@ export { default as DataTable } from "./uiComponents/ProductsList";
 export { default as InventoryCart } from "./uiComponents/InventoryCart";
 export { default as SearchButton } from "./uiComponents/SearchButton";
 export { default as DashPie } from "./uiComponents/DashPie";
+export { default as navItems } from "./uiComponents/navItems";
+

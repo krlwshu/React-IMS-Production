@@ -17,9 +17,11 @@ function ManageProducts() {
   const [data, setData] = useState([]);
 
   async function getData() {
-    await axios.post("/getSuppliersProductTypes").then(({ data }) => {
-      setData(data);
-    });
+    await axios
+      .post("http://localhost:5000/getSuppliersProductTypes")
+      .then(({ data }) => {
+        setData(data);
+      });
     console.log("fetched");
   }
 
@@ -81,7 +83,10 @@ function ManageProducts() {
       ).id;
 
       axios
-        .post("/createNewProduct", { formState, supplierId })
+        .post("http://localhost:5000/createNewProduct", {
+          formState,
+          supplierId,
+        })
         .then((response) => {
           if (response.status) {
             console.log(response.data);

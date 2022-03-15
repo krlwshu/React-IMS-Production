@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '../../redux/userSlice';
+
 export default function useToken() {
+
+  const dispatch = useDispatch();
+
   const getToken = () => {
     const tokenString = sessionStorage.getItem('token');
     const userToken = JSON.parse(tokenString);
@@ -14,7 +20,7 @@ export default function useToken() {
 
   // Set token
   const saveToken = userToken => {
-    if(userToken.verificationStatus){
+    if (userToken.verificationStatus) {
       sessionStorage.setItem('token', JSON.stringify(userToken.token));
       setIsVerified(true)
     }
@@ -30,21 +36,25 @@ export default function useToken() {
   // Check auth - needs refactoring, check out react-router-dom if time permits (Typescript though)
 
   const [loadingData, setLoadingData] = useState(true);
-  
+
 
   async function verifyToken() {
     let token = JSON.parse(sessionStorage.getItem("token"))
-    if(!token){
+    if (!token) {
       return false
     }
-    await axios
-      .get("/authVerify", {
-        headers: {"x-access-token":JSON.parse(sessionStorage.getItem("token"))}
+    return await axios
+      .get("http://localhost:5000/authVerify", {
+        headers: { "x-access-token": JSON.parse(sessionStorage.getItem("token")) }
       })
-      .then(({data}) => {
+      .then(({ data }) => {
         setIsVerified(data.auth);
         setLoadingData(false);
-      });
+        dispatch(setUser(data))
+        return data.auth
+      })
+      .catch((err) => { return false });
+    console.log(test)
   }
 
   const checkAuth = () => {
@@ -60,5 +70,5 @@ export default function useToken() {
     verifyAuth: checkAuth,
     signout: remToken,
     token
-  }  
+  }
 }
