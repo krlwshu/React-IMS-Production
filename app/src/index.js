@@ -20,7 +20,8 @@ import {
   Inventory,
   InventorySearch,
   TestRedux,
-  ManageSuppliers
+  ManageSuppliers,
+  AddProduct
 } from "./components";
 
 
@@ -45,6 +46,7 @@ const App = () => {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/manageproducts/:slug" element={<ManageProducts />} />
+        <Route path="/createproduct" element={<AddProduct />} />
         <Route path="/managesuppliers" element={<ManageSuppliers />} />
         <Route path="/supplierorders" element={<SupplierManageOrders />} />
         <Route path="/manageorders" element={<ManageOrders />} />

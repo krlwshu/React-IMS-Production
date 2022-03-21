@@ -293,7 +293,7 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
   try {
 
     let productSql = `
-    SELECT s.id, s.company_name, p.category, p.manufacturer FROM suppliers s
+    SELECT s.id, s.company_name, p.category, p.manufacturer, p.id as pid FROM suppliers s
     LEFT JOIN products p ON s.id = p.supplier_id
     GROUP BY company_name, category, manufacturer
     ORDER BY s.id
@@ -313,12 +313,14 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
 
 app.post('/createNewProduct', async (req, res) => {
 
-  const data = req.body;
+  const { productInfo } = req.body;
   try {
-    const newProduct = await createNewProduct(data);
+    const newProduct = await createNewProduct(productInfo);
+    reIndexData(await getProductByInfo(newProduct.id));
+    console.log("product created")
     res.status(200).json([newProduct]);
   } catch (e) {
-    console.log("Error updating order");
+    console.log("Error updating product");
     res.status(500).json(e)
   }
 
@@ -328,24 +330,32 @@ app.post('/createNewProduct', async (req, res) => {
 
 const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
-  console.log(data.formState)
-  let { code, desc, type, manu, pname, alert, price } = data.formState;
-  let supplierId = data.supplierId;
+  let { product_name, category, product_code, manufacturer, description, supplier_id, alert_level, unit_price } = data;
 
   let newProductSql = `
-  insert into products (supplier_id, category, product_code, description, manufacturer, product_name, alert_level, unit_price) values 
-  (?,?,?,?,?,?,?,?)
+    insert into products set
+    category = ?, 
+    product_code = ?, 
+    description = ?,
+    manufacturer = ?, 
+    product_name = ?,
+    supplier_id = (select id from suppliers where company_name = ?),
+    alert_level = ?, 
+    unit_price = ?
   `;
 
-  db.query(newProductSql, [supplierId, type, code, desc, manu, pname, alert, price], (err, results) => {
+  db.query(newProductSql, [category, product_code, description, manufacturer, product_name, supplier_id, alert_level, unit_price], (err, results) => {
     if (err) {
       console.log(err)
       return reject(false)
     } else {
-      return resolve("New Product Created!");
+      return resolve({ id: results.insertId, msg: "New Product Created!" });
     }
   });
 });
+
+
+// Udate existing product (api followed by function)
 
 
 app.post('/updateProduct', async (req, res) => {
@@ -697,7 +707,7 @@ const reIndexData = (docs) => new Promise((resolve, reject) => {
 
 
 // Delete document from search engine index - expects array in req.body.docId only
-app.get('/deleteDocuments', verifyJWT, async (req, res) => {
+app.get('/deleteDocument', verifyJWT, async (req, res) => {
 
   let { docId } = req.body;
 
@@ -706,6 +716,36 @@ app.get('/deleteDocuments', verifyJWT, async (req, res) => {
     .destroyDocuments(engineName, docId)
     .then((response) => {
       res.send(response)
+
+    })
+    .catch(error => console.log(error.errorMessages))
+
+})
+app.get('/deleteAllDocuments', verifyJWT, async (req, res) => {
+  let { docId } = req.body;
+  client
+    .listDocuments(engineName)
+    .then((docs) => {
+      const docIds = docs.results.map(item => item.id)
+      client
+        .destroyDocuments(engineName, docIds)
+        .then((response) => {
+          res.send(response)
+        })
+        .catch(error => console.log(error.errorMessages))
+    })
+    .catch(error => console.log(error.errorMessages))
+
+})
+app.get('/listdocs', verifyJWT, async (req, res) => {
+
+  let { docId } = req.body;
+
+  client
+    // .getDocuments(engineName, [97])
+    .listDocuments(engineName)
+    .then((response) => {
+      res.send(response.results)
 
     })
     .catch(error => console.log(error.errorMessages))

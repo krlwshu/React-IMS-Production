@@ -5,6 +5,7 @@ export { default as Footer } from "./Footer";
 export { default as Login } from "./Login";
 export { default as Dashboard } from "./Dashboard";
 export { default as ManageProducts } from "./ManageProducts";
+export { default as AddProduct } from "./AddProduct";
 export { default as ManageSuppliers } from "./ManageSuppliers";
 export { default as ManageOrders } from "./ManageOrders";
 export { default as SupplierManageOrders } from "./SupplierManageOrders";

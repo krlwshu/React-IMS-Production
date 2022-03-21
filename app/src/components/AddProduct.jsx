@@ -9,12 +9,12 @@ import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
 import { useParams } from "react-router-dom";
 import useToken from "./auth/useToken";
 
-function ManageProducts() {
+function AddProduct() {
   // get token
   const { token } = useToken();
 
   //Get product ID
-  const { slug } = useParams();
+  // const { slug } = useParams();
 
   // Load existing product data
 
@@ -22,18 +22,16 @@ function ManageProducts() {
     product_name: "",
     company_name: "",
     category: "",
+    supplier_id: "",
     product_code: "",
     manufacturer: "",
     description: "",
     unit_price: "",
     alert_level: "",
-    id: "",
   };
 
   const [loadingData, setLoadingData] = useState(true);
   const [productInfo, setProductInfo] = useState(defaultProductInfo);
-
-  const [locked, setLocked] = useState(false);
 
   // alert state
   const [alertState, setAlertState] = useState({
@@ -43,7 +41,7 @@ function ManageProducts() {
   });
 
   const alertSuccess = {
-    message: "Product Updated :)",
+    message: "Product created :)",
     isHidden: false,
     severity: "success",
   };
@@ -53,30 +51,15 @@ function ManageProducts() {
     severity: "Error",
   };
 
-  useEffect(() => {
-    async function getData() {
-      await axios
-        .post(
-          "/getProductDetails",
-          { id: slug },
-          { headers: { "x-access-token": JSON.parse(token) } }
-        )
-        .then(({ data }) => {
-          setProductInfo(data);
-          setLoadingData(false);
-        });
-    }
-    if (loadingData) {
-      getData();
-    }
-  }, [productInfo]);
-
   const [data, setData] = useState([]);
+  const [locked, setLocked] = useState(false);
 
   async function getData() {
     await axios
       .post("http://localhost:5000/getSuppliersProductTypes")
       .then(({ data }) => {
+        console.log(data);
+        setAlertState(alertSuccess);
         setData(data);
       });
   }
@@ -91,18 +74,18 @@ function ManageProducts() {
       [e.target.id]: e.target.value,
     };
 
+    console.log(e);
+
     setProductInfo(productinfo);
-    console.log(productInfo);
   };
 
   const handleSubmit = () => {
     axios
-      .post("http://localhost:5000/updateProduct", { productInfo })
+      .post("http://localhost:5000/createNewProduct", { productInfo })
       .then((response) => {
         if (response.status) {
-          setAlertState(alertSuccess);
+          setLocked(true);
         } else {
-          setAlertState(alertError);
           console.log("Error processing request");
         }
       })
@@ -159,20 +142,21 @@ function ManageProducts() {
               />
 
               <Tooltip
-                color="error"
                 placement="right"
                 title={
                   <h5 style={{ color: "white" }}>
-                    This field cannot be changed!
+                    Select pre-approved supplier
                   </h5>
                 }
               >
-                <TextField
+                <Autocomplete
+                  onSelect={(e) => handleFormChange(e)}
+                  options={[...new Set(data.map((item) => item.company_name))]}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Approved Supplier" />
+                  )}
                   id="supplier"
-                  label="Supplier Company"
-                  fullWidth
                   value={productInfo.company_name}
-                  disabled
                 />
               </Tooltip>
               <Tooltip
@@ -180,7 +164,7 @@ function ManageProducts() {
                 placement="right"
               >
                 <Autocomplete
-                  id="type"
+                  id="category"
                   onSelect={(e) => handleFormChange(e)}
                   options={[...new Set(data.map((item) => item.category))]}
                   renderInput={(params) => (
@@ -250,6 +234,7 @@ function ManageProducts() {
             sx={{ pt: 2 }}
             size="large"
             inputProps={{ min: 0 }}
+            multiline={true}
             fullWidth
             value={productInfo.unit_price}
           />
@@ -282,13 +267,13 @@ function ManageProducts() {
         <div className="col-lg-12">
           <Stack sx={{ width: "100%", pt: 10 }}>
             <Button
-              hidden={locked}
               sx={{ width: 250 }}
               variant="outlined"
               onClick={handleSubmit}
               color="success"
+              hidden={locked}
             >
-              Update Product
+              Create Product
             </Button>
             <Alert hidden={alertState.isHidden} severity={alertState.severity}>
               {alertState.message}
@@ -300,4 +285,4 @@ function ManageProducts() {
   );
 }
 
-export default ManageProducts;
+export default AddProduct;

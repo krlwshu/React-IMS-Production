@@ -15,7 +15,7 @@ const navItems = [
   },
   {
     label: "Add Products",
-    to: "manageproducts",
+    to: "createproduct",
   },
   {
     label: "Orders",
