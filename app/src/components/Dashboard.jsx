@@ -115,7 +115,7 @@ export default function Dashboard() {
             </Typography>
             {loadingDash === false && (
               <div style={{ height: 300 }}>
-                <DashPie data={dashData} />
+                <h1>Test</h1>
               </div>
             )}
           </Card>

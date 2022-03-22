@@ -6,11 +6,12 @@ import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-
 import store from './redux/store'
 import { Provider } from 'react-redux'
 
+
 import useToken from './components/auth/useToken';
-import axios from 'axios';
 
 import {
   Login,
+  Logout,
   Navigation,
   Footer,
   ManageProducts,
@@ -40,6 +41,7 @@ const App = () => {
   return (
 
     <Router>
+
       <Navigation />
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -51,7 +53,6 @@ const App = () => {
         <Route path="/supplierorders" element={<SupplierManageOrders />} />
         <Route path="/manageorders" element={<ManageOrders />} />
         <Route path="/inventory" element={<InventorySearch />} />
-        <Route path="/testredux" element={<TestRedux />} />
       </Routes>
       <Footer />
     </Router>

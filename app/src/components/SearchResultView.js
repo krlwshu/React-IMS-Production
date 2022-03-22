@@ -91,7 +91,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             dangerouslySetInnerHTML={{ __html: result.description.snippet }}
           />
         </a>
-        <StyledDeleteIcon color="error" />
+        {/* <StyledDeleteIcon color="error" /> */}
 
       </div>
       <div className="sui-result__body">
@@ -106,7 +106,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
           >
             <img
               // src={result.img.raw || '/images/img_placeholder.jpg'}
-              src={'/images/img_placeholder.jpg'}
+              src={result.image.raw}
               alt="thumb"
               style={{
                 display: "block",

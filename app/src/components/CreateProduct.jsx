@@ -285,7 +285,7 @@ function ManageProducts() {
               sx={{ width: 250 }}
               variant="contained"
               onClick={handleSubmit}
-              hidden={disabledState.submitState}
+              hidden={locked}
               color="success"
             >
               Create New Product

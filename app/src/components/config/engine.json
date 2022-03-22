@@ -9,6 +9,7 @@
     "product_code",
     "supplier_id",
     "alert_level",
+    "image",
     "manufacturer",
     "qty_avail",
     "id"

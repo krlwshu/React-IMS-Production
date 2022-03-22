@@ -25,10 +25,6 @@ const navItems = [
     label: "Supplier Order View",
     to: "supplierorders",
   },
-  {
-    label: "Logout",
-    to: "dashboard",
-  },
 ];
 
 export default navItems;

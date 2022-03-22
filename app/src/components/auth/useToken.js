@@ -27,8 +27,8 @@ export default function useToken() {
   };
 
   // Unset token
-  const remToken = userToken => {
-    // sessionStorage.removeItem('token');
+  const revokeSession = userToken => {
+    sessionStorage.removeItem('token');
     setIsVerified(false)
   };
 
@@ -68,7 +68,7 @@ export default function useToken() {
   return {
     setToken: saveToken,
     verifyAuth: checkAuth,
-    signout: remToken,
+    revoke: revokeSession,
     token
   }
 }

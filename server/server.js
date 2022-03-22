@@ -670,6 +670,7 @@ const getProductByInfo = (id = 0) => new Promise((resolve, reject) => {
     ci.name AS company_name,
     p.category,
     p.qty_avail,
+    p.image,
     product_code,
     manufacturer,
     description,
@@ -737,7 +738,7 @@ app.get('/deleteAllDocuments', verifyJWT, async (req, res) => {
     .catch(error => console.log(error.errorMessages))
 
 })
-app.get('/listdocs', verifyJWT, async (req, res) => {
+app.get('/listdocs', async (req, res) => {
 
   let { docId } = req.body;
 
@@ -745,7 +746,7 @@ app.get('/listdocs', verifyJWT, async (req, res) => {
     // .getDocuments(engineName, [97])
     .listDocuments(engineName)
     .then((response) => {
-      res.send(response.results)
+      res.send(response.results.map(item => item.id))
 
     })
     .catch(error => console.log(error.errorMessages))
