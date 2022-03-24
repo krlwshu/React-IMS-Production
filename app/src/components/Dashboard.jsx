@@ -34,6 +34,7 @@ export default function Dashboard() {
         .get("http://localhost:5000/getOrderUpdates", headers)
         .then(({ data }) => {
           setData(data);
+          console.log(data);
           setLoadingData(false);
         });
     }
@@ -44,7 +45,6 @@ export default function Dashboard() {
 
   const [loadingDataAlerts, setLoadingDataAlerts] = useState(true);
   const [alertingData, setAlertingData] = useState([]);
-
   const [loadingDash, setLoadingash] = useState(true);
   const [dashData, setDashData] = useState([]);
 
@@ -88,12 +88,7 @@ export default function Dashboard() {
       <div className="row">
         <div className="col-lg-4">
           <Card sx={{ p: 5, radius: 5 }}>
-            <Typography
-              sx={{ pl: 5 }}
-              variant="h5"
-              component="h5"
-              color="primary"
-            >
+            <Typography variant="h4" component="h4">
               Order Status
             </Typography>
             {loadingDash === false && (
@@ -103,23 +98,7 @@ export default function Dashboard() {
             )}
           </Card>
         </div>
-        <div className="col-lg-4">
-          <Card sx={{ p: 5, radius: 5 }}>
-            <Typography
-              sx={{ pl: 5 }}
-              variant="h5"
-              component="h5"
-              color="primary"
-            >
-              Order Status
-            </Typography>
-            {loadingDash === false && (
-              <div style={{ height: 300 }}>
-                <h1>Test</h1>
-              </div>
-            )}
-          </Card>
-        </div>
+
         <div className="col-lg-4">
           <Card sx={{ p: 5, radius: 5 }}>
             <Stack direction="row">
@@ -130,11 +109,19 @@ export default function Dashboard() {
               ></HourglassBottomOutlinedIcon>
               <Typography
                 sx={{ pl: 5 }}
-                variant="h5"
-                component="h5"
+                variant="h4"
+                component="h4"
                 color="secondary"
               >
-                Awaiting Supplier Response
+                Awaiting Supplier Response (
+                {
+                  data.filter(
+                    (item) =>
+                      item.supplier_approval_status === "New" &&
+                      item.im_approval !== "Canceled"
+                  ).length
+                }
+                )
               </Typography>
             </Stack>
             <List
@@ -145,7 +132,11 @@ export default function Dashboard() {
               }}
             >
               {data
-                .filter((item) => item.supplier_approval_status === "New")
+                .filter(
+                  (item) =>
+                    item.supplier_approval_status === "New" &&
+                    item.im_approval !== "Canceled"
+                )
                 .map((item) => (
                   <React.Fragment key={item.id}>
                     <ListItem key={`${item.id}_1`}>
@@ -164,9 +155,7 @@ export default function Dashboard() {
                 ))}
             </List>
           </Card>
-        </div>
-        <div className="col-lg-4">
-          <Card sx={{ p: 5, radius: 5 }}>
+          <Card sx={{ p: 5, mt: 2, radius: 5 }}>
             <Stack direction="row">
               <HourglassBottomOutlinedIcon
                 color="primary"
@@ -175,11 +164,19 @@ export default function Dashboard() {
               ></HourglassBottomOutlinedIcon>
               <Typography
                 sx={{ pl: 5 }}
-                variant="h5"
-                component="h5"
+                variant="h4"
+                component="h4"
                 color="primary"
               >
-                Awaiting IM Approval
+                Awaiting IM Approval (
+                {
+                  data.filter(
+                    (item) =>
+                      item.supplier_approval_status === "Partial" &&
+                      item.im_approval !== "Canceled"
+                  ).length
+                }
+                )
               </Typography>
             </Stack>
             <List
@@ -206,11 +203,11 @@ export default function Dashboard() {
                     </ListItem>
                     <Divider />
                   </React.Fragment>
-                ))}
+                )) || 0}
             </List>
           </Card>
         </div>
-        <div className="col-lg-6">
+        <div className="col-lg-4">
           <Card sx={{ p: 5, radius: 5 }}>
             <Stack direction="row">
               <WarningAmberIcon
@@ -219,7 +216,7 @@ export default function Dashboard() {
               ></WarningAmberIcon>
               <Typography
                 sx={{ color: "orange", pl: 5 }}
-                variant="h5"
+                variant="h4"
                 color="primary"
               >
                 Low Quantity Alerts
@@ -245,6 +242,7 @@ export default function Dashboard() {
             </List>
           </Card>
         </div>
+        <div className="col-lg-6"></div>
       </div>
     </Wrapper>
   );

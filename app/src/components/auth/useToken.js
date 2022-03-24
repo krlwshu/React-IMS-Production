@@ -51,6 +51,7 @@ export default function useToken() {
         setIsVerified(data.auth);
         setLoadingData(false);
         dispatch(setUser(data))
+        console.log(data)
         return data.auth
       })
       .catch((err) => { return false });

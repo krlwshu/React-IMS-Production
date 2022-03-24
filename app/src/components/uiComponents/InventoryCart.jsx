@@ -43,6 +43,7 @@ export default function InventoryCart(props) {
 
   //Get Items from Redux state
   const items = useSelector(selectItems);
+  console.log(items);
 
   // Set items in cart - tot up all quantities
   const itemCount = items.length
@@ -62,6 +63,7 @@ export default function InventoryCart(props) {
 
   // Handle order submit
   const handleSubmit = () => {
+    console.log(items);
     axios
       .post("http://localhost:5000/submitOrder", items)
       .then((response) => {

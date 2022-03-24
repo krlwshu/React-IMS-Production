@@ -62,8 +62,10 @@ app.use('/login', (req, res) => {
         }
         //If (results) and password match, sign token
         if (results.length > 0 && verifyPass(pass, results[0].password)) {
-          const { id, role, email, name, content, role_name } = results[0];
-          const token = jwt.sign({ id, role, content, email, name, role_name }, "jwtSecret", {
+          console.log(results)
+          const { id, role, email, name, content, role_name, company_id } = results[0];
+          console.log(company_id)
+          const token = jwt.sign({ id, role, content, email, name, role_name, company_id }, "jwtSecret", {
             expiresIn: 30000
           })
 
@@ -110,6 +112,7 @@ const verifyJWT = (req, res, next) => {
         req.role = decoded.role;
         req.userType = decoded.role_name;
         req.content = decoded.content;
+        req.company = decoded.company_id;
         next();
 
       }
@@ -127,18 +130,18 @@ app.get('/authVerify', verifyJWT, (req, res) => {
     userName: req.userName,
     role: req.role,
     userType: req.userType,
-    content: req.content.split(",")
+    company: req.company,
+    content: req.content.split(","),
   })
 })
 
 // Get orders from DB
-app.post('/getOrderItems', async (req, res) => {
+app.get('/getOrderItems', verifyJWT, async (req, res) => {
 
-  const { supplierId } = req.body;
-  console.log(supplierId);
+  const { userType, company } = req;
+  let filter = (userType === "supplier") ? ` where ci.id = ${company} ` : '';
 
-  let filter = (supplierId != 0) ? ` where s.id = ${supplierId} ` : '';
-
+  console.log(company)
   try {
 
 
@@ -162,6 +165,7 @@ app.post('/getOrderItems', async (req, res) => {
         JOIN order_items oi ON o.id = oi.order_id
         JOIN products p ON p.id = oi.id_product
         JOIN suppliers s ON s.id = o.id_supplier
+        JOIN company_info ci on s.company_id = ci.id
 
         ${filter}
         order by o.date_created asc
@@ -416,6 +420,7 @@ app.get('/getOrderUpdates', verifyJWT, async (req, res) => {
       p.product_code, 
       p.description, 
       oi.requested_quantity, 
+      oi.im_approval,
       p.manufacturer,
       oi.supplier_approval_status, 
       oi.supp_avail_qty, 
@@ -481,6 +486,7 @@ app.post('/submitOrder', async (req, res) => {
   let uniqueSuppliers = [...new Set(orderData.map(item => item.supplier_id))]
   let ordersCreated = [];
 
+  console.log(uniqueSuppliers)
 
   // Create orders and append items
   try {
@@ -499,6 +505,7 @@ app.post('/submitOrder', async (req, res) => {
 
     res.status(200).json(ordersCreated);
   } catch (e) {
+    console.log(e)
     console.log("Error placing order");
     res.status(500).json(e)
   }
@@ -510,6 +517,8 @@ const createNewOrder = (supplier) => new Promise((resolve, reject) => {
   let createOrderSQl = `
     insert into orders (id_supplier) values (?)
   `;
+
+  console.log(supplier)
 
   db.query(createOrderSQl, [supplier], (err, results) => {
     if (err) {
@@ -722,7 +731,7 @@ app.get('/deleteDocument', verifyJWT, async (req, res) => {
     .catch(error => console.log(error.errorMessages))
 
 })
-app.get('/deleteAllDocuments', verifyJWT, async (req, res) => {
+app.get('/deleteAllDocuments', async (req, res) => {
   let { docId } = req.body;
   client
     .listDocuments(engineName)

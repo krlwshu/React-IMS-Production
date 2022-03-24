@@ -14,16 +14,19 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 // import { Wrapper } from "./uiComponents/styled/Order.styles";
 import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
+import useToken from "../components/auth/useToken";
 
 function ManageOrders() {
+  const { token } = useToken();
   const [expanded, setExpanded] = React.useState(false);
 
   const [loadingData, setLoadingData] = useState(true);
   const [data, setData] = useState([]);
 
   async function getData() {
+    const headers = { headers: { "x-access-token": JSON.parse(token) } };
     await axios
-      .post("http://localhost:5000/getOrderItems", { supplierId: 0 })
+      .get("http://localhost:5000/getOrderItems", headers)
       .then(({ data }) => {
         setData(data);
         setLoadingData(false);

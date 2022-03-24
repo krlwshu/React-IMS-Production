@@ -51,6 +51,7 @@ function AddProduct() {
     severity: "Error",
   };
 
+  console.log(alertState);
   const [data, setData] = useState([]);
   const [locked, setLocked] = useState(false);
 
@@ -59,7 +60,6 @@ function AddProduct() {
       .post("http://localhost:5000/getSuppliersProductTypes")
       .then(({ data }) => {
         console.log(data);
-        setAlertState(alertSuccess);
         setData(data);
       });
   }
@@ -85,6 +85,7 @@ function AddProduct() {
       .then((response) => {
         if (response.status) {
           setLocked(true);
+          setAlertState(alertSuccess);
         } else {
           console.log("Error processing request");
         }
@@ -155,7 +156,7 @@ function AddProduct() {
                   renderInput={(params) => (
                     <TextField {...params} label="Select Approved Supplier" />
                   )}
-                  id="supplier"
+                  id="company_name"
                   value={productInfo.company_name}
                 />
               </Tooltip>

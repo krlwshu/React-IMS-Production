@@ -10,6 +10,7 @@
     "supplier_id",
     "alert_level",
     "image",
+    "unit_price",
     "manufacturer",
     "qty_avail",
     "id"
@@ -21,7 +22,8 @@
     "manufacturer",
     "product_code",
     "alert_level",
-    "qty_avail"
+    "qty_avail",
+    "unit_price"
   ],
   "titleField": "description",
   "urlField": "id"

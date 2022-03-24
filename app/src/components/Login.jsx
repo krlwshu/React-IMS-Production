@@ -60,7 +60,24 @@ export default function Login({ setToken }) {
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
-        />
+        >
+          {/* <video
+            style={{
+              backgroundSize: "cover",
+              height: "100%",
+              backgroundPosition: "center",
+              transform: "scale(1.2)",
+              overflow: "none",
+            }}
+            autoPlay
+            muted
+            loop
+            id="myVideo"
+          >
+            <source src="/video/DJI_0005.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video> */}
+        </Grid>
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{

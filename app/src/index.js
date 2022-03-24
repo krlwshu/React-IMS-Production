@@ -5,6 +5,9 @@ import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter as Router, Route, Routes, useParams } from "react-router-dom";
 import store from './redux/store'
 import { Provider } from 'react-redux'
+import { useSelector } from "react-redux";
+import { user } from "./redux/userSlice";
+
 
 
 import useToken from './components/auth/useToken';
@@ -29,6 +32,7 @@ import {
 
 
 const App = () => {
+  const userProfile = useSelector(user);
 
   let { slug } = useParams();
 
@@ -38,13 +42,22 @@ const App = () => {
     return <Login setToken={setToken} />
   }
 
+  const getDefRoute = () => {
+    if (userProfile.userType === "admin") {
+      return <Dashboard />
+    } else {
+      return <SupplierManageOrders />
+    }
+  }
+
+
   return (
 
     <Router>
 
       <Navigation />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={getDefRoute()} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/manageproducts/:slug" element={<ManageProducts />} />
