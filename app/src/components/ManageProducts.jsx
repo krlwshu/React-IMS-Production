@@ -33,6 +33,8 @@ function ManageProducts() {
   const [loadingData, setLoadingData] = useState(true);
   const [productInfo, setProductInfo] = useState(defaultProductInfo);
 
+  const [locked, setLocked] = useState(false);
+
   // alert state
   const [alertState, setAlertState] = useState({
     isHidden: true,
@@ -98,7 +100,9 @@ function ManageProducts() {
       .post("http://localhost:5000/updateProduct", { productInfo })
       .then((response) => {
         if (response.status) {
+          setAlertState(alertSuccess);
         } else {
+          setAlertState(alertError);
           console.log("Error processing request");
         }
       })
@@ -246,7 +250,6 @@ function ManageProducts() {
             sx={{ pt: 2 }}
             size="large"
             inputProps={{ min: 0 }}
-            multiline={true}
             fullWidth
             value={productInfo.unit_price}
           />
@@ -279,8 +282,9 @@ function ManageProducts() {
         <div className="col-lg-12">
           <Stack sx={{ width: "100%", pt: 10 }}>
             <Button
+              hidden={locked}
               sx={{ width: 250 }}
-              variant="contained"
+              variant="outlined"
               onClick={handleSubmit}
               color="success"
             >

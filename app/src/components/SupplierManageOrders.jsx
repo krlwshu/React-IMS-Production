@@ -22,11 +22,16 @@ import Slide from "@mui/material/Slide";
 import { StyledContainer } from "./uiComponents/styled/Order.styles";
 import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
 
+// Headers / token
+import useToken from "../components/auth/useToken";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 export default function DataTable() {
+  const { token } = useToken();
+
   const [submitDialogOpen, setSubmitDialogOpen] = React.useState(false);
 
   const handleCloseDialog = () => {
@@ -47,11 +52,9 @@ export default function DataTable() {
   }
 
   async function getData() {
-    const filter = {
-      supplierId: parseInt(localStorage.getItem("supplier_id")),
-    };
+    const headers = { headers: { "x-access-token": JSON.parse(token) } };
     await axios
-      .post("http://localhost:5000/getOrderItems", filter)
+      .get("http://localhost:5000/getOrderItems", headers)
       .then(({ data }) => {
         setOrderData(data);
         setLoadingData(false);

@@ -62,8 +62,10 @@ app.use('/login', (req, res) => {
         }
         //If (results) and password match, sign token
         if (results.length > 0 && verifyPass(pass, results[0].password)) {
-          const { id, role, email, name, content, role_name } = results[0];
-          const token = jwt.sign({ id, role, content, email, name, role_name }, "jwtSecret", {
+          console.log(results)
+          const { id, role, email, name, content, role_name, company_id } = results[0];
+          console.log(company_id)
+          const token = jwt.sign({ id, role, content, email, name, role_name, company_id }, "jwtSecret", {
             expiresIn: 30000
           })
 
@@ -110,6 +112,7 @@ const verifyJWT = (req, res, next) => {
         req.role = decoded.role;
         req.userType = decoded.role_name;
         req.content = decoded.content;
+        req.company = decoded.company_id;
         next();
 
       }
@@ -127,18 +130,18 @@ app.get('/authVerify', verifyJWT, (req, res) => {
     userName: req.userName,
     role: req.role,
     userType: req.userType,
-    content: req.content.split(",")
+    company: req.company,
+    content: req.content.split(","),
   })
 })
 
 // Get orders from DB
-app.post('/getOrderItems', async (req, res) => {
+app.get('/getOrderItems', verifyJWT, async (req, res) => {
 
-  const { supplierId } = req.body;
-  console.log(supplierId);
+  const { userType, company } = req;
+  let filter = (userType === "supplier") ? ` where ci.id = ${company} ` : '';
 
-  let filter = (supplierId != 0) ? ` where s.id = ${supplierId} ` : '';
-
+  console.log(company)
   try {
 
 
@@ -162,6 +165,7 @@ app.post('/getOrderItems', async (req, res) => {
         JOIN order_items oi ON o.id = oi.order_id
         JOIN products p ON p.id = oi.id_product
         JOIN suppliers s ON s.id = o.id_supplier
+        JOIN company_info ci on s.company_id = ci.id
 
         ${filter}
         order by o.date_created asc
@@ -293,7 +297,7 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
   try {
 
     let productSql = `
-    SELECT s.id, s.company_name, p.category, p.manufacturer FROM suppliers s
+    SELECT s.id, s.company_name, p.category, p.manufacturer, p.id as pid FROM suppliers s
     LEFT JOIN products p ON s.id = p.supplier_id
     GROUP BY company_name, category, manufacturer
     ORDER BY s.id
@@ -313,12 +317,14 @@ app.post('/getSuppliersProductTypes', async (req, res) => {
 
 app.post('/createNewProduct', async (req, res) => {
 
-  const data = req.body;
+  const { productInfo } = req.body;
   try {
-    const newProduct = await createNewProduct(data);
+    const newProduct = await createNewProduct(productInfo);
+    reIndexData(await getProductByInfo(newProduct.id));
+    console.log("product created")
     res.status(200).json([newProduct]);
   } catch (e) {
-    console.log("Error updating order");
+    console.log("Error updating product");
     res.status(500).json(e)
   }
 
@@ -328,24 +334,32 @@ app.post('/createNewProduct', async (req, res) => {
 
 const createNewProduct = (data, qty) => new Promise((resolve, reject) => {
 
-  console.log(data.formState)
-  let { code, desc, type, manu, pname, alert, price } = data.formState;
-  let supplierId = data.supplierId;
+  let { product_name, category, product_code, manufacturer, description, supplier_id, alert_level, unit_price } = data;
 
   let newProductSql = `
-  insert into products (supplier_id, category, product_code, description, manufacturer, product_name, alert_level, unit_price) values 
-  (?,?,?,?,?,?,?,?)
+    insert into products set
+    category = ?, 
+    product_code = ?, 
+    description = ?,
+    manufacturer = ?, 
+    product_name = ?,
+    supplier_id = (select id from suppliers where company_name = ?),
+    alert_level = ?, 
+    unit_price = ?
   `;
 
-  db.query(newProductSql, [supplierId, type, code, desc, manu, pname, alert, price], (err, results) => {
+  db.query(newProductSql, [category, product_code, description, manufacturer, product_name, supplier_id, alert_level, unit_price], (err, results) => {
     if (err) {
       console.log(err)
       return reject(false)
     } else {
-      return resolve("New Product Created!");
+      return resolve({ id: results.insertId, msg: "New Product Created!" });
     }
   });
 });
+
+
+// Udate existing product (api followed by function)
 
 
 app.post('/updateProduct', async (req, res) => {
@@ -406,6 +420,7 @@ app.get('/getOrderUpdates', verifyJWT, async (req, res) => {
       p.product_code, 
       p.description, 
       oi.requested_quantity, 
+      oi.im_approval,
       p.manufacturer,
       oi.supplier_approval_status, 
       oi.supp_avail_qty, 
@@ -471,6 +486,7 @@ app.post('/submitOrder', async (req, res) => {
   let uniqueSuppliers = [...new Set(orderData.map(item => item.supplier_id))]
   let ordersCreated = [];
 
+  console.log(uniqueSuppliers)
 
   // Create orders and append items
   try {
@@ -489,6 +505,7 @@ app.post('/submitOrder', async (req, res) => {
 
     res.status(200).json(ordersCreated);
   } catch (e) {
+    console.log(e)
     console.log("Error placing order");
     res.status(500).json(e)
   }
@@ -500,6 +517,8 @@ const createNewOrder = (supplier) => new Promise((resolve, reject) => {
   let createOrderSQl = `
     insert into orders (id_supplier) values (?)
   `;
+
+  console.log(supplier)
 
   db.query(createOrderSQl, [supplier], (err, results) => {
     if (err) {
@@ -660,6 +679,7 @@ const getProductByInfo = (id = 0) => new Promise((resolve, reject) => {
     ci.name AS company_name,
     p.category,
     p.qty_avail,
+    p.image,
     product_code,
     manufacturer,
     description,
@@ -697,7 +717,7 @@ const reIndexData = (docs) => new Promise((resolve, reject) => {
 
 
 // Delete document from search engine index - expects array in req.body.docId only
-app.get('/deleteDocuments', verifyJWT, async (req, res) => {
+app.get('/deleteDocument', verifyJWT, async (req, res) => {
 
   let { docId } = req.body;
 
@@ -706,6 +726,36 @@ app.get('/deleteDocuments', verifyJWT, async (req, res) => {
     .destroyDocuments(engineName, docId)
     .then((response) => {
       res.send(response)
+
+    })
+    .catch(error => console.log(error.errorMessages))
+
+})
+app.get('/deleteAllDocuments', async (req, res) => {
+  let { docId } = req.body;
+  client
+    .listDocuments(engineName)
+    .then((docs) => {
+      const docIds = docs.results.map(item => item.id)
+      client
+        .destroyDocuments(engineName, docIds)
+        .then((response) => {
+          res.send(response)
+        })
+        .catch(error => console.log(error.errorMessages))
+    })
+    .catch(error => console.log(error.errorMessages))
+
+})
+app.get('/listdocs', async (req, res) => {
+
+  let { docId } = req.body;
+
+  client
+    // .getDocuments(engineName, [97])
+    .listDocuments(engineName)
+    .then((response) => {
+      res.send(response.results.map(item => item.id))
 
     })
     .catch(error => console.log(error.errorMessages))

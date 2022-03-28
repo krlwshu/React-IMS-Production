@@ -15,7 +15,7 @@ const navItems = [
   },
   {
     label: "Add Products",
-    to: "manageproducts",
+    to: "createproduct",
   },
   {
     label: "Orders",
@@ -24,10 +24,6 @@ const navItems = [
   {
     label: "Supplier Order View",
     to: "supplierorders",
-  },
-  {
-    label: "Logout",
-    to: "dashboard",
   },
 ];
 

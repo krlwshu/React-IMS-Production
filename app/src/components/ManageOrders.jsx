@@ -12,17 +12,21 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { StyledContainer } from "./uiComponents/styled/Order.styles";
+// import { Wrapper } from "./uiComponents/styled/Order.styles";
+import { Wrapper } from "./uiComponents/styled/Dashboard-styles";
+import useToken from "../components/auth/useToken";
 
 function ManageOrders() {
+  const { token } = useToken();
   const [expanded, setExpanded] = React.useState(false);
 
   const [loadingData, setLoadingData] = useState(true);
   const [data, setData] = useState([]);
 
   async function getData() {
+    const headers = { headers: { "x-access-token": JSON.parse(token) } };
     await axios
-      .post("http://localhost:5000/getOrderItems", { supplierId: 0 })
+      .get("http://localhost:5000/getOrderItems", headers)
       .then(({ data }) => {
         setData(data);
         setLoadingData(false);
@@ -34,53 +38,55 @@ function ManageOrders() {
   }, []);
 
   return (
-    <div className="contact">
-      <StyledContainer className="container">
-        <div className="row align-items-center my-5">
-          <div className="col-lg-12">
-            <Typography
-              variant="h4"
-              component="h4"
-              sx={{ pb: 5, fontWeight: 400 }}
-            >
-              Manage Ordered Items
-            </Typography>
-          </div>
-          <div className="col-lg-12">
-            {[...new Set(data.map((item) => item.parent_order))].map(
-              (parent_order) => (
-                <Accordion key={parent_order}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel2bh-content"
-                    id="panel3bh-header"
-                  >
-                    <Typography
-                      sx={{ width: "33%", flexShrink: 0, fontWeight: 800 }}
-                    >
-                      Order #{parent_order}
-                    </Typography>
-                    {/* <Typography sx={{ color: 'text.secondary', fontWeight: 800 }}>Supplier : {row.company_name}</Typography> */}
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <OrderTable
-                      getData={getData}
-                      parent_order={parent_order}
-                      orderData={data}
-                    />
-                  </AccordionDetails>
-                </Accordion>
-              )
-            )}
-          </div>
+    <Wrapper>
+      <div className="row align-items-center">
+        <div className="col-lg-12">
+          <Typography
+            variant="h4"
+            component="h4"
+            sx={{ pb: 5, fontWeight: 400 }}
+          >
+            Manage Ordered Items ({data.length})
+          </Typography>
         </div>
-        <Alert sx={{ fontSize: "1.2rem" }} severity="info">
-          Expand the orders to view and update items. <br />
-          <b>Note:</b> Only partially available and new items can be cancelled.
-          Approved items have already been fulfilled by supplier.
-        </Alert>
-      </StyledContainer>
-    </div>
+        <div className="col-lg-12">
+          {[...new Set(data.map((item) => item.parent_order))].map(
+            (parent_order) => (
+              <Accordion key={parent_order}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel2bh-content"
+                  id="panel3bh-header"
+                >
+                  <Typography
+                    sx={{ width: "33%", flexShrink: 0, fontWeight: 600 }}
+                  >
+                    Order #
+                    {`${parent_order} - ${
+                      data.find((fn) => fn.parent_order === parent_order)
+                        .company_name
+                    }`}
+                  </Typography>
+                  {/* <Typography sx={{ color: 'text.secondary', fontWeight: 800 }}>Supplier : {row.company_name}</Typography> */}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <OrderTable
+                    getData={getData}
+                    parent_order={parent_order}
+                    orderData={data}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            )
+          )}
+        </div>
+      </div>
+      <Alert sx={{ fontSize: "1.2rem" }} severity="info">
+        Expand the orders to view and update items. <br />
+        <b>Note:</b> Only partially available and new items can be cancelled.
+        Approved items have already been fulfilled by supplier.
+      </Alert>
+    </Wrapper>
   );
 }
 
@@ -171,7 +177,6 @@ function OrderTable(props) {
                     {subItems.supplier_approval_status === "Partial" &&
                       subItems.im_approval !== "Canceled" && (
                         <Button
-                          variant="text"
                           onClick={() => handleApprove(subItems.id)}
                           color="success"
                           variant="outlined"
@@ -182,7 +187,6 @@ function OrderTable(props) {
                     {subItems.supplier_approval_status !== "Approved" &&
                       subItems.im_approval !== "Canceled" && (
                         <Button
-                          variant="text"
                           onClick={() => handleCancel(subItems.id)}
                           color="error"
                           variant="outlined"

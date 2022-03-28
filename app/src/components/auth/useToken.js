@@ -27,8 +27,8 @@ export default function useToken() {
   };
 
   // Unset token
-  const remToken = userToken => {
-    // sessionStorage.removeItem('token');
+  const revokeSession = userToken => {
+    sessionStorage.removeItem('token');
     setIsVerified(false)
   };
 
@@ -51,6 +51,7 @@ export default function useToken() {
         setIsVerified(data.auth);
         setLoadingData(false);
         dispatch(setUser(data))
+        console.log(data)
         return data.auth
       })
       .catch((err) => { return false });
@@ -68,7 +69,7 @@ export default function useToken() {
   return {
     setToken: saveToken,
     verifyAuth: checkAuth,
-    signout: remToken,
+    revoke: revokeSession,
     token
   }
 }

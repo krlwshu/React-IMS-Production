@@ -91,7 +91,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             dangerouslySetInnerHTML={{ __html: result.description.snippet }}
           />
         </a>
-        <StyledDeleteIcon color="error" />
+        {/* <StyledDeleteIcon color="error" /> */}
 
       </div>
       <div className="sui-result__body">
@@ -106,7 +106,7 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
           >
             <img
               // src={result.img.raw || '/images/img_placeholder.jpg'}
-              src={'/images/img_placeholder.jpg'}
+              src={result.image.raw}
               alt="thumb"
               style={{
                 display: "block",
@@ -151,11 +151,20 @@ export default function Results({ teststate, result, onClickLink, ...rest }) {
             <li>
               <span className="sui-result__key">Quantity</span>{" "}
               <Chip style={
-                result.qty_avail.raw < result.alert_level.raw ? styles.chipAlert : styles.chipOk}
+                result.qty_avail.raw < result.alert_level.raw && result.alert_level !== 0 ? styles.chipAlert : styles.chipOk}
                 className="sui-result__value"
                 label={result.qty_avail.raw}
                 size="small"
                 color="primary"
+              />
+            </li>
+            <li>
+              <span className="sui-result__key">Unit Price</span>{" "}
+              <span
+                className="sui-result__value"
+                dangerouslySetInnerHTML={{
+                  __html: `£${result.unit_price.snippet}`
+                }}
               />
             </li>
           </ul>
