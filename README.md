@@ -20,7 +20,7 @@ docker run -d --name "elasticsearch" --network "elastic" --publish "9200:9200"  
 
 ## 3) Kibana installation
   
-docker run --name "kibana" --network "elastic" --publish "5601:5601" --interactive --tty --env "ENTERPRISESEARCH_HOST=http://enterprise-search:3002" "docker.elastic.co/kibana/kibana:8.0.0"![image](https://user-images.githubusercontent.com/93937576/160456717-65801e5b-5c78-40ba-8815-a9ffc636426b.png)
+docker run --name "kibana" --network "elastic" --publish "5601:5601" --interactive --tty --env "ENTERPRISESEARCH_HOST=http://enterprise-search:3002" "docker.elastic.co/kibana/kibana:8.0.0"
 
-  
-docker run --name "enterprise-search" --network "elastic" --publish "3002:3002" --volume "es-config:/usr/share/enterprise-search/es-config:ro" --interactive --tty --rm --env "secret_management.encryption_keys=['66ad614b43fa3e27222b03e258f4719af0c77dbad7359b042dce53dd0fabd0cc']" --env "allow_es_settings_modification=true" --env "elasticsearch.host=https://172.22.0.3:9200" --env "elasticsearch.username=elastic" --env "elasticsearch.password=Karl1234" --env "elasticsearch.ssl.enabled=true" --env "elasticsearch.ssl.certificate_authority=/usr/share/enterprise-search/es-config/certs/http_ca.crt" --env "kibana.external_url=http://kibana:5601" "docker.elastic.co/enterprise-search/enterprise-search:8.0.0"
+## 3) Enterprise-search installation
+docker run --name "enterprise-search" --network "elastic" --publish "3002:3002" --volume "es-config:/usr/share/enterprise-search/es-config:ro" --interactive --tty --rm --env "secret_management.encryption_keys=['<INSERT ENC KEY>']" --env "allow_es_settings_modification=true" --env "elasticsearch.host=https://<ADD ES HOST ADDR>:9200" --env "elasticsearch.username=elastic" --env "elasticsearch.password=<ADD INITIAL PWD>" --env "elasticsearch.ssl.enabled=true" --env "elasticsearch.ssl.certificate_authority=/usr/share/enterprise-search/es-config/certs/http_ca.crt" --env "kibana.external_url=http://kibana:5601" "docker.elastic.co/enterprise-search/enterprise-search:8.0.0"
