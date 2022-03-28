@@ -50,7 +50,8 @@ Follow installation logs and make note of the encryption ID.
   Update API key in config/engine.config
 
   
-** Known Issues:**
+## Known issues:
+  
   After stopping the containers, sometimes services become unreachable. If so perform the followin restart process:
   
   - sudo systemctl restart docker
