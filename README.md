@@ -31,7 +31,7 @@ docker inspect CONTAINER_ID | grep "IPAddress" (make a note of Elasticsearch IP 
   
 Follow installation logs and make note of the encryption ID.
 
-## 3) Enterprise-search installation
+## 4) Enterprise-search installation
 ```docker run --name "enterprise-search" --network "elastic" --publish "3002:3002" --volume "es-config:/usr/share/enterprise-search/es-config:ro" --interactive --tty --rm --env "secret_management.encryption_keys=['<INSERT ENC KEY>']" --env "allow_es_settings_modification=true" --env "elasticsearch.host=https://<ADD ES HOST ADDR>:9200" --env "elasticsearch.username=elastic" --env "elasticsearch.password=<ADD INITIAL PWD>" --env "elasticsearch.ssl.enabled=true" --env "elasticsearch.ssl.certificate_authority=/usr/share/enterprise-search/es-config/certs/http_ca.crt" --env "kibana.external_url=http://kibana:5601" "docker.elastic.co/enterprise-search/enterprise-search:8.0.0"```
 
   
@@ -43,9 +43,12 @@ Known Issues:
   After stopping the containers, sometimes services become unreachable.
   Restarting docker is a workaround:
   
-  sudo systemctl restart docker
-  docker run elasticsearch
-  docker run kibana
-  docker run enterprise-search
+  - sudo systemctl restart docker
+  - docker run elasticsearch
+  - docker run kibana
+  - docker run enterprise-search
   
  
+## 5 App installation
+  
+  
