@@ -13,11 +13,11 @@ Place MySQL DB backup into user's home directory, run the following command to s
 ```sudo sh -c 'cat DB_bu.sql | docker exec -i mysql_server /usr/bin/mysql -u root --password=secret ims'```
 
   
-docker -ps (check if running)
+```docker -ps``` (check if running)
   
 ## 2) Elasticsearch installation
   
-docker network create elastic
+```docker network create elastic```
   
 ```docker run -d --name "elasticsearch" --network "elastic" --publish "9200:9200"  --volume "es-data:/usr/share/elasticsearch/data:rw"  --volume "es-config:/usr/share/elasticsearch/config:rw" --env "discovery.type=single-node" --tty --rm "docker.elastic.co/elasticsearch/elasticsearch:8.0.0"```
  
