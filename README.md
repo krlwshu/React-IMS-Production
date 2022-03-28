@@ -49,6 +49,5 @@ Known Issues:
   - docker run enterprise-search
   
  
-## 5 App installation
-  
-  
+## 5 App installation (pre-containerized)
+  docker run -p 3000:3000 -e github='https://github.com/krlwshu/react-ims-production.git' -it karlwshu/react-ims-production
