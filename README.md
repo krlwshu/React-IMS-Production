@@ -38,16 +38,23 @@ Follow installation logs and make note of the encryption ID.
   All instances should be set up with local volume mapping. When closing, they can simply be started using:
   ```docker run CONTAINER_NAME```
   
+  Create search engine:
+  http://HOST_URL:3002/
+  Enterprise Search -> Search Engines -> Create Search Engine
+  Store public API key (for search)
   
-Known Issues:
-  After stopping the containers, sometimes services become unreachable.
-  Restarting docker is a workaround:
+
+## 5 App installation
+  
+  docker run -p 3000:3000 -e github='https://github.com/krlwshu/react-ims-production.git' -it karlwshu/react-ims-production
+  Update API key in config/engine.config
+
+  
+** Known Issues:**
+  After stopping the containers, sometimes services become unreachable. If so perform the followin restart process:
   
   - sudo systemctl restart docker
   - docker run elasticsearch
   - docker run kibana
   - docker run enterprise-search
-  
- 
-## 5 App installation (pre-containerized)
-  docker run -p 3000:3000 -e github='https://github.com/krlwshu/react-ims-production.git' -it karlwshu/react-ims-production
+  (Depending on your sudoers configuration or Linux distro, you may need to prefix the above commands with **sudo**)
