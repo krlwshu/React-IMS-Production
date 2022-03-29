@@ -52,7 +52,7 @@ Follow installation logs and make note of the encryption ID.
   
 ## Known issues:
   
-  After stopping the containers, sometimes services become unreachable. If so perform the followin restart process:
+  After stopping the containers, sometimes services become unreachable when restarted. If so perform the followin restart process:
   
   - sudo systemctl restart docker
   - docker run elasticsearch
