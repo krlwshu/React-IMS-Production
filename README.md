@@ -50,14 +50,17 @@ Follow installation logs and make note of the encryption ID.
   Update API key in config/engine.config
 
   
-## Data set-up:
+## 6 Data set-up:
+  
+  - Express server instance must be running.
+  
   ### Create search engine instance
   
 ``` curl -X POST '<ENTERPRISE_SEARCH_BASE_URL>/api/as/v1/engines' -H 'Content-Type: application/json' -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' -d '{"name": "-ims-search-engine"}' ```
   
  ### Syncronise data (one-time activity):
-  ``` curl -X POST '<Express Server IP>:5000/searchSync' -H 'Content-Type: application/json' -H 'x-access-token: <JWT Token>' -d '{ "name": "-ims-search-engine"}' ```
-**Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
+  - ``` curl -X POST '<Express Server IP>:5000/searchSync' -H 'Content-Type: application/json' -H 'x-access-token: <JWT Token>' -d '{ "name": "-ims-search-engine"}' ```
+- **Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
   
   
 # Known issues:
