@@ -596,6 +596,7 @@ async function notifySupplierByEmail(order) {
       return "Error sending mail"
       return console.log(error);
     }
+    console.log(info)
 
   });
   return "success"
