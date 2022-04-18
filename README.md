@@ -60,12 +60,12 @@ Follow installation logs and make note of the encryption ID.
 }'```
   
   ### Syncronise data (one-time activity):
-  ```curl -X POST '<Express Server IP>:5000/searchSync' \
+  ``` curl -X POST '<Express Server IP>:5000/searchSync' \
 -H 'Content-Type: application/json' \
 -H 'x-access-token: <JWT Token>' \
 -d '{
   "name": "-ims-search-engine"
-}'```
+}' ```
 **Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
   
   
