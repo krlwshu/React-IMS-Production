@@ -10,7 +10,7 @@ IMS Production
 docker run -d --name mysql_server -e MYSQL_DATABASE='ims' -e MYSQL_USER='ims' -e MYSQL_PASSWORD='<REDACTED>' -e MYSQL_ROOT_PASSWORD='<REDACTED>' -v $HOME/mysql-data:/var/lib/mysql --network node-api-network mysql:8.0
 
 Place MySQL DB backup into user's home directory, run the following command to stream the creation commands to MySQL:
-```sudo sh -c 'cat DB_bu.sql | docker exec -i mysql_server /usr/bin/mysql -u root --password=secret ims'```
+```sudo sh -c 'cat DB_bu.sql | docker exec -i mysql_server /usr/bin/mysql -u root --password=secret ims' ```
 
   
 ```docker -ps``` (check if running)
@@ -27,7 +27,7 @@ docker inspect CONTAINER_ID | grep "IPAddress" (make a note of Elasticsearch IP 
 
 ## 3) Kibana installation
    
-```docker run --name "kibana" --network "elastic" --publish "5601:5601" --interactive --tty --env "ENTERPRISESEARCH_HOST=http://enterprise-search:3002" "docker.elastic.co/kibana/kibana:8.0.0"```
+```docker run --name "kibana" --network "elastic" --publish "5601:5601" --interactive --tty --env "ENTERPRISESEARCH_HOST=http://enterprise-search:3002" "docker.elastic.co/kibana/kibana:8.0.0" ```
   
 Follow installation logs and make note of the encryption ID.
 
@@ -57,7 +57,7 @@ Follow installation logs and make note of the encryption ID.
 -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' \
 -d '{
   "name": "-ims-search-engine"
-}'``````
+}' ```
   
   ### Syncronise data (one-time activity):
   ``` curl -X POST '<Express Server IP>:5000/searchSync' \
