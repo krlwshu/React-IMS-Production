@@ -62,6 +62,8 @@ Follow installation logs and make note of the encryption ID.
   - ``` curl -X POST '<Express Server IP>:5000/searchSync' -H 'Content-Type: application/json' -H 'x-access-token: <JWT Token>' -d '{ "name": "-ims-search-engine"}' ```
 - **Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
   
+  -**The search API key MUST be updated in engine.json within main application for app/search engine integration to work**
+  - This can be retrived from within Kibana - search engine API settings.
   
 # Known issues:
   
