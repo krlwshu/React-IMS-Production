@@ -52,9 +52,8 @@ Follow installation logs and make note of the encryption ID.
   
 ## Data set-up:
   ### Create search engine instance
-```curl -X POST '<ENTERPRISE_SEARCH_BASE_URL>/api/as/v1/engines' \
-   -H 'Content-Type: application/json' \
-   -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' \
+  
+``` curl -X POST '<ENTERPRISE_SEARCH_BASE_URL>/api/as/v1/engines' -H 'Content-Type: application/json' -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' \
    -d '{"name": "-ims-search-engine"}' ```
   
   ### Syncronise data (one-time activity):
