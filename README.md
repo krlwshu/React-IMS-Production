@@ -54,16 +54,20 @@ Follow installation logs and make note of the encryption ID.
   
   - Express server instance must be running.
   
-  ### Create search engine instance
+  ### 1) Create search engine instance
   
 ``` curl -X POST '<ENTERPRISE_SEARCH_BASE_URL>/api/as/v1/engines' -H 'Content-Type: application/json' -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' -d '{"name": "ims-search-engine"}' ```
+
+  ### 2) Authorization
+-**The search API key MUST be updated in app/src/components/config/engine.json for app/search engine integration to work**
+- This can be retrived from within Kibana - search engine API settings.
   
- ### Syncronise data (one-time activity):
-  - ``` curl -X POST '<Express Server IP>:5000/searchSync' -H 'Content-Type: application/json' -H 'x-access-token: <JWT Token>' -d '{ "name": "-ims-search-engine"}' ```
-- **Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
+ ### 3) Syncronise databases (one-time activity):
+  - ``` curl -X POST '<Express Server IP>:5000/searchSync' -H 'Content-Type: application/json' -H 'x-access-token: **<JWT Token>**'```
   
-  -**The search API key MUST be updated in engine.json within main application for app/search engine integration to work**
-  - This can be retrived from within Kibana - search engine API settings.
+- **Note:** JWT token can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
+  
+
   
 # Known issues:
   
