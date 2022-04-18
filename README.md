@@ -57,7 +57,7 @@ Follow installation logs and make note of the encryption ID.
 -H 'Authorization: Bearer private-xxxxxxxxxxxxxxxxxxxx' \
 -d '{
   "name": "-ims-search-engine"
-}'```
+}'``````
   
   ### Syncronise data (one-time activity):
   ``` curl -X POST '<Express Server IP>:5000/searchSync' \
