@@ -66,11 +66,10 @@ Follow installation logs and make note of the encryption ID.
 -d '{
   "name": "-ims-search-engine"
 }'```
+**Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
   
-  - **Note:** JWT can be can be retrieved from an authenticated session. Dev tools > Application > Session Storage (Copy and pasted JWT token above)
   
-  
-## Known issues:
+# Known issues:
   
   After stopping the containers, sometimes services become unreachable when restarted. If so perform the followin restart process:
   
